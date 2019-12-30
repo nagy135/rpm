@@ -9,12 +9,17 @@ use std::fs::OpenOptions;
 // use std::time::SystemTime;
 // use self::crypto::digest::Digest;
 // use self::crypto::sha2::Sha256;
+use std::str::from_utf8;
 
 use std::thread;
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::{Read, Write};
 
 use rpm::constants;
+use rpm::constants::Event as Event;
+
+
+// {{{ RECORD IMPLEMENTATION
 
 #[derive(Debug)]
 struct Record {
@@ -22,6 +27,28 @@ struct Record {
     login   : String,
     password: String
 }
+
+impl Record {
+    fn save(&self) {
+        let mut file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open(constants::STORAGE)
+            .unwrap();
+
+        if let Err(e) = writeln!(file, "{}", &self) {
+            panic!("Couldn't write to file: {}", e);
+        }
+        println!("Record was saved successfully:\n{}", &self);
+    }
+}
+impl fmt::Display for Record {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} ||| {} ||| {}", self.key, self.login, self.password)
+    }
+}
+
+// }}}
 
 fn main() {
     run_server();
@@ -50,13 +77,32 @@ fn run_server() {
     drop(listener);
 }
 
+fn handle_new() -> String {
+    println!("handle new");
+    "new".to_string()
+}
+
+fn handle_get() -> String {
+    println!("handle get");
+    "get".to_string()
+}
+
 fn handle_client(mut stream: TcpStream) {
     let mut data = [0 as u8; 50]; // using 50 byte buffer
     match stream.read(&mut data) {
         Ok(size) => {
-            // echo everything!
-            println!("{:?}", &data[0..size]);
-            stream.write(&data[0..size]).unwrap();
+            let flag = &data[0];
+            let response: String = match flag {
+                1 => handle_new(),
+                2 => handle_get(),
+                _ => "unknown".to_string()
+            };
+            let data = &data[1..size];
+            let response = response.into_bytes();
+            // println!("{:?}", &data[0..size]);
+            println!("flag {:?}", flag);
+            println!("data {:?}", from_utf8(&data).unwrap());
+            stream.write(&response).unwrap();
         },
         Err(_) => {
             println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
@@ -64,25 +110,3 @@ fn handle_client(mut stream: TcpStream) {
         }
     } {}
 }
-
-// {{{ RECORD IMPLEMENTATION
-impl Record {
-    fn save(&self) {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .append(true)
-            .open(constants::STORAGE)
-            .unwrap();
-
-        if let Err(e) = writeln!(file, "{}", &self) {
-            panic!("Couldn't write to file: {}", e);
-        }
-        println!("Record was saved successfully:\n{}", &self);
-    }
-}
-impl fmt::Display for Record {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} ||| {} ||| {}", self.key, self.login, self.password)
-    }
-}
-// }}}

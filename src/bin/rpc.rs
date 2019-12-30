@@ -3,17 +3,7 @@ use std::net::{TcpStream};
 use std::io::{Read, Write};
 use std::str::from_utf8;
 
-// {{{ Enum Event
-#[derive(Debug, Copy, Clone)]
-enum Event {
-    New = 1,
-    Get = 2
-}
-
-fn enum_to_u8(e: &Event) -> u8 {
-    *e as u8
-}
-// }}}
+use rpm::constants::Event as Event;
 
 fn main(){
     let args: Vec<String> = env::args().collect();
@@ -31,6 +21,16 @@ fn main(){
     }
 }
 
+fn first_zero(data: &[u8; 50]) -> usize {
+    for i in 0..50 {
+        if data[i] == 0 {
+            return i
+        }
+    }
+    49
+
+}
+
 fn send_to_daemon(message: String, event: Event) -> String{
     let mut response = String::from("");
     match TcpStream::connect("localhost:3333") {
@@ -38,18 +38,20 @@ fn send_to_daemon(message: String, event: Event) -> String{
             let mut msg_vec = message.into_bytes();
             // println!("Sending : {:?}", msg);
             // println!("Sending event: {:?}", enum_to_u8(&event));
-            msg_vec.insert(0, enum_to_u8(&event));
-            println!("{:?}", msg_vec);
+            msg_vec.insert(0, event.to_u8());
+            println!("Sending: {:?}", msg_vec);
             let msg: &[u8] = &msg_vec; // c: &[u8]
             // let msg = b"haha";
 
             stream.write(msg).unwrap();
 
-            let mut data = [0 as u8; 8];
-            match stream.read_exact(&mut data) {
+            let mut data = [0 as u8; 50];
+            match stream.read(&mut data) {
                 Ok(_) => {
-                    let text = from_utf8(&data).unwrap().to_string();
-                    println!("Response from daemon: {:?}", text);
+                    let zero_index = first_zero(&data);
+                    let text = from_utf8(&data[..zero_index]).unwrap().to_string();
+                    // println!("{:?}", &data);
+                    println!("Response: {:?}", text);
                     response = text.clone();
                 },
                 Err(e) => {
@@ -72,6 +74,8 @@ fn new(){
 
 fn get(args: &Vec<String>){
     println!("Getting record from given key {:?}", args);
+    let response = send_to_daemon(String::from("hahahaha"), Event::Get);
+    println!("{:?}", response);
 }
 fn validate(){
     println!("Validating...");
