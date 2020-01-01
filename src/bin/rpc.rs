@@ -10,7 +10,7 @@ fn main(){
     if args.len() > 1 {
         let command: &String = &args[1];
         match command.as_ref() {
-            "new" => new(),
+            "new" => new(&args),
             "get" => get(&args),
             "validate" => validate(),
             "change" => change(),
@@ -27,8 +27,7 @@ fn first_zero(data: &[u8; 50]) -> usize {
             return i
         }
     }
-    49
-
+    50
 }
 
 fn send_to_daemon(message: String, event: Event) -> String{
@@ -36,13 +35,9 @@ fn send_to_daemon(message: String, event: Event) -> String{
     match TcpStream::connect("localhost:3333") {
         Ok(mut stream) => {
             let mut msg_vec = message.into_bytes();
-            // println!("Sending : {:?}", msg);
-            // println!("Sending event: {:?}", enum_to_u8(&event));
             msg_vec.insert(0, event.to_u8());
             println!("Sending: {:?}", msg_vec);
             let msg: &[u8] = &msg_vec; // c: &[u8]
-            // let msg = b"haha";
-
             stream.write(msg).unwrap();
 
             let mut data = [0 as u8; 50];
@@ -66,15 +61,15 @@ fn send_to_daemon(message: String, event: Event) -> String{
     response
 }
 
-fn new(){
+fn new(args: &Vec<String>){
     println!("Creating new record");
-    let response = send_to_daemon(String::from("testtest"), Event::New);
+    let response = send_to_daemon(args[2].clone(), Event::New);
     println!("{:?}", response);
 }
 
 fn get(args: &Vec<String>){
     println!("Getting record from given key {:?}", args);
-    let response = send_to_daemon(String::from("hahahaha"), Event::Get);
+    let response = send_to_daemon(args[2].clone(), Event::Get);
     println!("{:?}", response);
 }
 fn validate(){

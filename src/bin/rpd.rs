@@ -77,6 +77,17 @@ fn run_server() {
     drop(listener);
 }
 
+
+fn handle_validate() -> String {
+    println!("handle validate");
+    "validate".to_string()
+}
+
+fn handle_verify() -> String {
+    println!("handle verify");
+    "verify".to_string()
+}
+
 fn handle_new() -> String {
     println!("handle new");
     "new".to_string()
@@ -92,10 +103,11 @@ fn handle_client(mut stream: TcpStream) {
     match stream.read(&mut data) {
         Ok(size) => {
             let flag = &data[0];
-            let response: String = match flag {
-                1 => handle_new(),
-                2 => handle_get(),
-                _ => "unknown".to_string()
+            let response: String = match Event::from(flag) {
+                Event::New => handle_new(),
+                Event::Get => handle_get(),
+                Event::Validate => handle_validate(),
+                Event::Verify => handle_verify()
             };
             let data = &data[1..size];
             let response = response.into_bytes();
