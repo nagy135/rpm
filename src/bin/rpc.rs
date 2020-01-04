@@ -1,3 +1,6 @@
+extern crate rpassword;
+
+use rpassword::read_password;
 use std::env;
 use std::net::{TcpStream};
 use std::io::{Read, Write};
@@ -74,6 +77,10 @@ fn get(args: &Vec<String>){
 }
 fn validate(){
     println!("Validating...");
+    println!("Type master password: ");
+    let password = read_password().unwrap();
+    let response = send_to_daemon(password, Event::Validate);
+    println!("{:?}", response);
 }
 fn change(){
     println!("Changing password");
