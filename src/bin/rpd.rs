@@ -6,7 +6,7 @@ use std::fs;
 // use std::io;
 use std::fs::OpenOptions;
 // use std::io::prelude::*;
-// use std::time::SystemTime;
+use std::time::SystemTime;
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use std::str::from_utf8;
@@ -53,34 +53,41 @@ impl fmt::Display for Record {
 fn main() {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     let mut validated: bool = false;
+    let mut stamp = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as u32;;
     // accept connections and process them, spawning a new thread for each one
     println!("Server listening on port 3333");
     for stream in listener.incoming() {
-        println!("before EVERYTHING: {}", validated);
+        println!("========================================");
+        check_validation_timeout(&mut validated, &stamp);
+        println!("VALIDATION STATUS start: {}", validated);
         match stream {
             Ok(stream) => {
                 println!("New connection: {}", stream.peer_addr().unwrap());
-                thread::spawn(move|| {
+                let validation_from_thread = thread::spawn(move|| {
                     // connection succeeded
-                    handle_client(stream, &mut validated)
+                    handle_client(stream)
                 });
+                validated = validation_from_thread.join().unwrap();
             }
             Err(e) => {
                 println!("Error: {}", e);
                 /* connection failed */
             }
         }
+        println!("VALIDATION STATUS end: {}", validated);
     }
     // close the socket server
     drop(listener);
 }
 
-fn handle_client(mut stream: TcpStream, validated: &mut bool) {
+fn handle_client(mut stream: TcpStream) -> bool {
     let mut data = [0 as u8; 50]; // using 50 byte buffer
     match stream.read(&mut data) {
         Ok(size) => {
             let flag = &data[0];
-            println!("validated before: {}", validated);
             let mut new_validated = false;
             let content = from_utf8(&data[1..size]).unwrap();
             let response: String = match Event::from(flag) {
@@ -89,19 +96,21 @@ fn handle_client(mut stream: TcpStream, validated: &mut bool) {
                 Event::Validate => handle_validate(&content, &mut new_validated),
                 Event::Verify => handle_verify()
             };
-            *validated = new_validated;
             let response = response.into_bytes();
-            println!("validated_after {}", new_validated);
             println!("flag {:?}", flag);
             println!("content {:?}", content);
             stream.write(&response).unwrap();
+            return new_validated;
         },
         Err(_) => {
             println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
             stream.shutdown(Shutdown::Both).unwrap();
+            return false;
         }
-    } {}
+    }
 }
+
+// {{{ utils
 fn is_password_valid(pass: &str) -> Result<(), &str> {
     let mut hasher = Sha256::new();
     hasher.input_str(pass);
@@ -119,11 +128,28 @@ fn is_password_valid(pass: &str) -> Result<(), &str> {
     Ok(())
 }
 
+fn check_validation_timeout(validated: &mut bool, stamp: &u32) -> bool{
+    println!("validated {}", validated);
+    println!("stamp {}", stamp);
+    true
+    //let stamp = SystemTime::now()
+    //    .duration_since(SystemTime::UNIX_EPOCH)
+    //    .unwrap()
+    //    .as_secs() as u32;
+    //let previous_stamp: u32 = get_previous_stamp();
+    //if previous_stamp + PASS_DELAY >= stamp {
+    //    //pass is valid
+    //    return true;
+    //} else {
+    //    //invalid pass stamp
+    //    return false;
+    //}
+}
+// }}} utils
+
 // {{{ handles
 
 fn handle_validate(pass: &str, new_validated: &mut bool) -> String {
-
-    println!("handle validate with pass {} {}", pass, new_validated);
     let validation_res = is_password_valid(pass);
     match validation_res {
         Ok(()) => {
