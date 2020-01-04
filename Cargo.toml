@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 rust-crypto = "0.2.36"
+rpassword = "0.0.4"
 
 [[bin]]
 name = "rpd"

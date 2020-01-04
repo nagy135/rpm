@@ -2,13 +2,13 @@ extern crate crypto;
 
 // use std::env;
 use std::fmt;
-// use std::fs;
+use std::fs;
 // use std::io;
 use std::fs::OpenOptions;
 // use std::io::prelude::*;
 // use std::time::SystemTime;
-// use self::crypto::digest::Digest;
-// use self::crypto::sha2::Sha256;
+use self::crypto::digest::Digest;
+use self::crypto::sha2::Sha256;
 use std::str::from_utf8;
 
 use std::thread;
@@ -51,20 +51,18 @@ impl fmt::Display for Record {
 // }}}
 
 fn main() {
-    run_server();
-}
-
-fn run_server() {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
+    let mut validated: bool = false;
     // accept connections and process them, spawning a new thread for each one
     println!("Server listening on port 3333");
     for stream in listener.incoming() {
+        println!("before EVERYTHING: {}", validated);
         match stream {
             Ok(stream) => {
                 println!("New connection: {}", stream.peer_addr().unwrap());
                 thread::spawn(move|| {
                     // connection succeeded
-                    handle_client(stream)
+                    handle_client(stream, &mut validated)
                 });
             }
             Err(e) => {
@@ -77,10 +75,66 @@ fn run_server() {
     drop(listener);
 }
 
+fn handle_client(mut stream: TcpStream, validated: &mut bool) {
+    let mut data = [0 as u8; 50]; // using 50 byte buffer
+    match stream.read(&mut data) {
+        Ok(size) => {
+            let flag = &data[0];
+            println!("validated before: {}", validated);
+            let mut new_validated = false;
+            let content = from_utf8(&data[1..size]).unwrap();
+            let response: String = match Event::from(flag) {
+                Event::New => handle_new(),
+                Event::Get => handle_get(),
+                Event::Validate => handle_validate(&content, &mut new_validated),
+                Event::Verify => handle_verify()
+            };
+            *validated = new_validated;
+            let response = response.into_bytes();
+            println!("validated_after {}", new_validated);
+            println!("flag {:?}", flag);
+            println!("content {:?}", content);
+            stream.write(&response).unwrap();
+        },
+        Err(_) => {
+            println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
+            stream.shutdown(Shutdown::Both).unwrap();
+        }
+    } {}
+}
+fn is_password_valid(pass: &str) -> Result<(), &str> {
+    let mut hasher = Sha256::new();
+    hasher.input_str(pass);
+    let hash = hasher.result_str();
+    println!("hash {}", hash);
 
-fn handle_validate() -> String {
-    println!("handle validate");
-    "validate".to_string()
+    let old_hash = fs::read_to_string(constants::PASSWORD_HASH_HOLDER)
+        .expect("Something went wrong reading the hash file");
+    if old_hash.trim().is_empty() {
+        return Err("Password is empty");
+    }
+    if hash != old_hash.trim() {
+        return Err("Your password does not match !!!");
+    }
+    Ok(())
+}
+
+// {{{ handles
+
+fn handle_validate(pass: &str, new_validated: &mut bool) -> String {
+
+    println!("handle validate with pass {} {}", pass, new_validated);
+    let validation_res = is_password_valid(pass);
+    match validation_res {
+        Ok(()) => {
+            *new_validated = true;
+            return "validated successfully".to_string()
+        },
+        Err(reason) => {
+            *new_validated = false;
+            return reason.to_string()
+        }
+    }
 }
 
 fn handle_verify() -> String {
@@ -98,27 +152,4 @@ fn handle_get() -> String {
     "get".to_string()
 }
 
-fn handle_client(mut stream: TcpStream) {
-    let mut data = [0 as u8; 50]; // using 50 byte buffer
-    match stream.read(&mut data) {
-        Ok(size) => {
-            let flag = &data[0];
-            let response: String = match Event::from(flag) {
-                Event::New => handle_new(),
-                Event::Get => handle_get(),
-                Event::Validate => handle_validate(),
-                Event::Verify => handle_verify()
-            };
-            let data = &data[1..size];
-            let response = response.into_bytes();
-            // println!("{:?}", &data[0..size]);
-            println!("flag {:?}", flag);
-            println!("data {:?}", from_utf8(&data).unwrap());
-            stream.write(&response).unwrap();
-        },
-        Err(_) => {
-            println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
-            stream.shutdown(Shutdown::Both).unwrap();
-        }
-    } {}
-}
+// }}} handles

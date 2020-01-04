@@ -166,6 +166,7 @@ Engine512State	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/r
 Engine512State	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha2.rs	/^struct Engine512State {$/;"	s
 Error	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^    Error(SymmetricCipherError)$/;"	e	enum:BlockEngineState
 Event	/home/infiniter/Code/rpm/src/lib.rs	/^    impl Event {$/;"	c	module:constants
+Event	/home/infiniter/Code/rpm/src/lib.rs	/^    impl From<&u8> for Event {$/;"	c	module:constants
 Event	/home/infiniter/Code/rpm/src/lib.rs	/^    pub enum Event {$/;"	g	module:constants
 FE_D	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^static FE_D : Fe = Fe([-10913610,13857413,-15372611,6949391,114729,-8787816,-6275908,-3247719,-1/;"	v
 FE_D2	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^static FE_D2 : Fe = Fe([-21827239,-5839606,-30745221,13898782,229458,15978800,-12551817,-6495438/;"	v
@@ -210,7 +211,7 @@ GeP3	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto
 GeP3	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^pub struct GeP3 {$/;"	s
 GePrecomp	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^impl GePrecomp {$/;"	c
 GePrecomp	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^pub struct GePrecomp {$/;"	s
-Get	/home/infiniter/Code/rpm/src/lib.rs	/^        Get = 2$/;"	e	enum:constants::Event
+Get	/home/infiniter/Code/rpm/src/lib.rs	/^        Get = 2,$/;"	e	enum:constants::Event
 Gf128	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/ghash.rs	/^impl BitXor for Gf128 {$/;"	c
 Gf128	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/ghash.rs	/^impl Gf128 {$/;"	c
 Gf128	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/ghash.rs	/^struct Gf128 { d: simd::u32x4 }$/;"	s
@@ -273,6 +274,7 @@ Md5	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-
 Md5	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/md5.rs	/^pub struct Md5 {$/;"	s
 Md5State	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/md5.rs	/^impl Md5State {$/;"	c
 Md5State	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/md5.rs	/^struct Md5State {$/;"	s
+MutableByteVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    trait MutableByteVector {$/;"	i	module:unix
 NeedInput	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^    NeedInput,$/;"	e	enum:BlockEngineState
 NeedOutput	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^    NeedOutput,$/;"	e	enum:BlockEngineState
 New	/home/infiniter/Code/rpm/src/lib.rs	/^        New = 1,$/;"	e	enum:constants::Event
@@ -404,6 +406,9 @@ SynchronousStreamCipher	/home/infiniter/.cargo/registry/src/github.com-1ecc6299d
 T	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/cryptoutil.rs	/^impl <T: FixedBuffer> StandardPadding for T {$/;"	c
 T	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/cryptoutil.rs	/^impl <T> WriteExt for T where T: io::Write {$/;"	c
 TESTS	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/whirlpool.rs	/^    static TESTS: [(&'static str, &'static str); 18] = [$/;"	v	module:test
+TEST_EOF	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    static mut TEST_EOF: bool = false;$/;"	v	module:unix
+TEST_HAS_SEEN_EOF_BUFFER	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    static mut TEST_HAS_SEEN_EOF_BUFFER: bool = false;$/;"	v	module:unix
+TEST_HAS_SEEN_REGULAR_BUFFER	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    static mut TEST_HAS_SEEN_REGULAR_BUFFER: bool = false;$/;"	v	module:unix
 Test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aes.rs	/^    struct Test {$/;"	s	module:test
 Test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/bcrypt.rs	/^    struct Test {$/;"	s	module:test
 Test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/bcrypt_pbkdf.rs	/^        struct Test {$/;"	s	function:test::test_bcrypt_hash
@@ -426,6 +431,9 @@ TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-
 TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/chacha20.rs	/^        struct TestVector {$/;"	s	function:test::test_chacha20_256_tls_vectors_96_nonce
 TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/chacha20poly1305.rs	/^  struct TestVector {$/;"	s	module:test
 TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/hkdf.rs	/^    struct TestVector<D: Digest>{$/;"	s	module:test
+Validate	/home/infiniter/Code/rpm/src/lib.rs	/^        Validate = 3,$/;"	e	enum:constants::Event
+Vec	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    impl MutableByteVector for Vec<u8> {$/;"	c	module:unix
+Verify	/home/infiniter/Code/rpm/src/lib.rs	/^        Verify = 4$/;"	e	enum:constants::Event
 Whirlpool	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/api.rs	/^    Whirlpool,$/;"	e	enum:DigestSpec
 Whirlpool	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/whirlpool.rs	/^impl Digest for Whirlpool {$/;"	c
 Whirlpool	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/whirlpool.rs	/^impl Whirlpool {$/;"	c
@@ -831,6 +839,7 @@ fortuna_new_1k	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/r
 fortuna_new_32	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/fortuna.rs	/^    pub fn fortuna_new_32(bh: &mut Bencher) {$/;"	f	module:bench
 fortuna_new_64	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/fortuna.rs	/^    pub fn fortuna_new_64(bh: &mut Bencher) {$/;"	f	module:bench
 fortuna_new_64k	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/fortuna.rs	/^    pub fn fortuna_new_64k(bh: &mut Bencher) {$/;"	f	module:bench
+from	/home/infiniter/Code/rpm/src/lib.rs	/^        fn from(i: &u8) -> Self {$/;"	P	implementation:constants::Event
 from_bytes	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^    pub fn from_bytes(s: &[u8]) -> Fe {$/;"	P	implementation:Fe
 from_bytes	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/ghash.rs	/^    fn from_bytes(bytes: &[u8]) -> Gf128 {$/;"	P	implementation:Gf128
 from_bytes_negate_vartime	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^    pub fn from_bytes_negate_vartime(s: &[u8]) -> Option<GeP3> {$/;"	P	implementation:GeP3
@@ -852,6 +861,8 @@ get_plain	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-c
 get_plain	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^        fn get_plain<'a>(&'a self) -> &'a [u8] {$/;"	P	implementation:test::CtrTest
 get_plain	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^        fn get_plain<'a>(&'a self) -> &'a [u8] {$/;"	P	implementation:test::EcbTest
 get_plain	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^        fn get_plain<'a>(&'a self) -> &'a [u8];$/;"	P	interface:test::CipherTest
+get_reader	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    fn get_reader() -> Stdin {$/;"	f	module:unix
+get_reader	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    fn get_reader<'a>() -> BufReader<File> {$/;"	f	module:unix
 get_test_vectors	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aes_gcm.rs	/^    fn get_test_vectors()-> [TestVector; 5]{$/;"	f	module:test
 get_test_vectors	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/chacha20poly1305.rs	/^  fn get_test_vectors()-> Vec<TestVector>{$/;"	f	module:test
 ghash	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/lib.rs	/^pub mod ghash;$/;"	n
@@ -990,6 +1001,7 @@ is_keccak	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-c
 is_negative	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^    fn is_negative(&self) -> bool {$/;"	P	implementation:Fe
 is_nonzero	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^    fn is_nonzero(&self) -> bool {$/;"	P	implementation:Fe
 is_shake	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha3.rs	/^    pub fn is_shake(&self) -> bool {$/;"	P	implementation:Sha3Mode
+it_works	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    fn it_works() {$/;"	f	module:unix
 iv	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aes_gcm.rs	/^                iv:  Vec<u8>,$/;"	m	struct:test::TestVector
 iv	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^        iv: Vec<u8>,$/;"	m	struct:test::CbcTest
 j	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/rc4.rs	/^    j: u8,$/;"	m	struct:Rc4
@@ -1305,6 +1317,7 @@ rc4	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-
 rc4_10	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/rc4.rs	/^    pub fn rc4_10(bh: & mut Bencher) {$/;"	f	module:bench
 rc4_1k	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/rc4.rs	/^    pub fn rc4_1k(bh: & mut Bencher) {$/;"	f	module:bench
 rc4_64k	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/rc4.rs	/^    pub fn rc4_64k(bh: & mut Bencher) {$/;"	f	module:bench
+read_password	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    pub fn read_password() -> IoResult<String> {$/;"	f	module:unix
 read_row_major	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aessafe.rs	/^    fn read_row_major(data: &[u8]) -> u32x4 {$/;"	f	function:bit_slice_1x128_with_u32x4
 read_u32_be	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/cryptoutil.rs	/^pub fn read_u32_be(input: &[u8]) -> u32 {$/;"	f
 read_u32_le	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/cryptoutil.rs	/^pub fn read_u32_le(input: &[u8]) -> u32 {$/;"	f
@@ -1483,6 +1496,8 @@ set_lastblock	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/ru
 set_lastblock	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blake2s.rs	/^    fn set_lastblock(&mut self) {$/;"	P	implementation:Blake2s
 set_lastnode	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blake2b.rs	/^    fn set_lastnode(&mut self) {$/;"	P	implementation:Blake2b
 set_lastnode	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blake2s.rs	/^    fn set_lastnode(&mut self) {$/;"	P	implementation:Blake2s
+set_memory	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^        fn set_memory(&mut self, value: u8) {$/;"	P	implementation:unix::Vec
+set_memory	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^        fn set_memory(&mut self, value: u8);$/;"	P	interface:unix::MutableByteVector
 set_pad	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha3.rs	/^        fn set_pad(offset: usize, buf: &mut [u8]) {$/;"	f	method:Sha3::finalize
 setup	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/bcrypt.rs	/^fn setup(cost: u32, salt: &[u8], key: &[u8]) -> Blowfish {$/;"	f
 setup_working_key_aesni_128	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aesni.rs	/^fn setup_working_key_aesni_128(key: &[u8], key_type: KeyType, round_key: &mut [u8]) {$/;"	f
@@ -1796,6 +1811,7 @@ un_bit_slice_1x128_with_u32x4	/home/infiniter/.cargo/registry/src/github.com-1ec
 un_bit_slice_1x16_with_u16	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aessafe.rs	/^fn un_bit_slice_1x16_with_u16(bs: &Bs8State<u16>, output: &mut [u8]) {$/;"	f
 un_bit_slice_4x1_with_u16	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aessafe.rs	/^fn un_bit_slice_4x1_with_u16(bs: &Bs8State<u16>) -> u32 {$/;"	f
 un_bit_slice_4x4_with_u16	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aessafe.rs	/^fn un_bit_slice_4x4_with_u16(bs: &Bs8State<u16>) -> (u32, u32, u32, u32) {$/;"	f
+unix	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^mod unix {$/;"	n
 update	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blake2b.rs	/^    fn update( &mut self, mut input: &[u8] ) {$/;"	P	implementation:Blake2b
 update	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blake2s.rs	/^    fn update( &mut self, mut input: &[u8] ) {$/;"	P	implementation:Blake2s
 update	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/chacha20.rs	/^    fn update(&mut self) {$/;"	P	implementation:ChaCha20
