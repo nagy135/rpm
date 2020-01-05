@@ -2,7 +2,7 @@ use std::convert::From;
 
 pub mod constants {
     pub static PASSWORD_HASH_HOLDER: &'static str = "/home/infiniter/pass_hash";
-    pub const PASS_DELAY: u32 = 5;
+    pub const PASS_DELAY: u64 = 5;
     pub static STORAGE: &'static str = "/home/infiniter/storage.db";
 
     // {{{ Enum Event
@@ -10,8 +10,7 @@ pub mod constants {
     pub enum Event {
         New = 1,
         Get = 2,
-        Validate = 3,
-        Verify = 4
+        Validate = 3
     }
     impl Event {
         pub fn to_u8(&self) -> u8 {
@@ -24,8 +23,7 @@ pub mod constants {
                 1 => Event::New,
                 2 => Event::Get,
                 3 => Event::Validate,
-                4 => Event::Verify,
-                _ => Event::Verify
+                _ => Event::Validate
             }
         }
     }
