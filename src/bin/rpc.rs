@@ -25,7 +25,7 @@ fn main(){
 }
 
 fn first_zero(data: &[u8; 50]) -> usize {
-    for i in 0..50 {
+    for i in 1..50 { // skipping first index, might be validation zero
         if data[i] == 0 {
             return i
         }
@@ -33,13 +33,12 @@ fn first_zero(data: &[u8; 50]) -> usize {
     50
 }
 
-fn send_to_daemon(message: String, event: Event) -> String{
-    let mut response = String::from("");
+fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
+    let result: Result<String, String>;
     match TcpStream::connect("localhost:3333") {
         Ok(mut stream) => {
             let mut msg_vec = message.into_bytes();
             msg_vec.insert(0, event.to_u8());
-            println!("Sending: {:?}", msg_vec);
             let msg: &[u8] = &msg_vec; // c: &[u8]
             stream.write(msg).unwrap();
 
@@ -47,21 +46,26 @@ fn send_to_daemon(message: String, event: Event) -> String{
             match stream.read(&mut data) {
                 Ok(_) => {
                     let zero_index = first_zero(&data);
-                    let text = from_utf8(&data[..zero_index]).unwrap().to_string();
-                    // println!("{:?}", &data);
-                    println!("Response: {:?}", text);
-                    response = text.clone();
+                    let validated = &data[0];
+                    let text = from_utf8(&data[1..zero_index]).unwrap().to_string();
+                    if *validated == 0 {
+                        result = Err("Validation failed!!!".to_string());
+                    } else {
+                        result = Ok(text.clone());
+                    }
                 },
                 Err(e) => {
                     println!("Failed to receive data: {}", e);
+                    result = Err("Read failed".to_string());
                 }
             }
         },
         Err(e) => {
             println!("Failed to connect: {}", e);
+            result = Err("Connect failed".to_string());
         }
     }
-    response
+    result
 }
 
 fn new(args: &Vec<String>){
