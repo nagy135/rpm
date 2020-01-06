@@ -431,9 +431,8 @@ TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-
 TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/chacha20.rs	/^        struct TestVector {$/;"	s	function:test::test_chacha20_256_tls_vectors_96_nonce
 TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/chacha20poly1305.rs	/^  struct TestVector {$/;"	s	module:test
 TestVector	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/hkdf.rs	/^    struct TestVector<D: Digest>{$/;"	s	module:test
-Validate	/home/infiniter/Code/rpm/src/lib.rs	/^        Validate = 3,$/;"	e	enum:constants::Event
+Validate	/home/infiniter/Code/rpm/src/lib.rs	/^        Validate = 3$/;"	e	enum:constants::Event
 Vec	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    impl MutableByteVector for Vec<u8> {$/;"	c	module:unix
-Verify	/home/infiniter/Code/rpm/src/lib.rs	/^        Verify = 4$/;"	e	enum:constants::Event
 Whirlpool	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/api.rs	/^    Whirlpool,$/;"	e	enum:DigestSpec
 Whirlpool	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/whirlpool.rs	/^impl Digest for Whirlpool {$/;"	c
 Whirlpool	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/whirlpool.rs	/^impl Whirlpool {$/;"	c
@@ -880,11 +879,10 @@ h	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.
 h	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha1.rs	/^    h: [u32; STATE_LEN],$/;"	m	struct:Sha1
 h	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha2.rs	/^    h: [u32; 8],$/;"	m	struct:Engine256State
 h	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha2.rs	/^    h: [u64; 8]$/;"	m	struct:Engine512State
-handle_client	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_client(mut stream: TcpStream) {$/;"	f
+handle_client	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_client(mut stream: TcpStream, mut validate: &mut bool) -> bool {$/;"	f
 handle_get	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_get() -> String {$/;"	f
-handle_new	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_new() -> String {$/;"	f
-handle_validate	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_validate() -> String {$/;"	f
-handle_verify	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_verify() -> String {$/;"	f
+handle_new	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_new(validated: &mut bool) -> String {$/;"	f
+handle_validate	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn handle_validate(pass: &str, validate: &mut bool) -> String {$/;"	f
 has_next	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^        fn has_next<R: ReadBuffer, W: WriteBuffer>($/;"	f	method:BlockEngine::fast_mode
 hash	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/ghash.rs	/^    fn hash() {$/;"	f	module:test
 hash	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/salsa20.rs	/^    fn hash(&mut self) {$/;"	P	implementation:Salsa20
@@ -1000,6 +998,7 @@ is_full	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-cry
 is_keccak	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha3.rs	/^    pub fn is_keccak(&self) -> bool {$/;"	P	implementation:Sha3Mode
 is_negative	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^    fn is_negative(&self) -> bool {$/;"	P	implementation:Fe
 is_nonzero	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/curve25519.rs	/^    fn is_nonzero(&self) -> bool {$/;"	P	implementation:Fe
+is_password_valid	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn is_password_valid(pass: &str) -> Result<(), &str> {$/;"	f
 is_shake	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/sha3.rs	/^    pub fn is_shake(&self) -> bool {$/;"	P	implementation:Sha3Mode
 it_works	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rpassword-0.0.4/src/lib.rs	/^    fn it_works() {$/;"	f	module:unix
 iv	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aes_gcm.rs	/^                iv:  Vec<u8>,$/;"	m	struct:test::TestVector
@@ -1443,7 +1442,6 @@ run_inc	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-cry
 run_inc1_test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^    fn run_inc1_test<T: CipherTest, E: Encryptor, D: Decryptor>($/;"	f	module:test
 run_rand_test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^    fn run_rand_test<T, E, D, NewEncFunc, NewDecFunc>($/;"	f	module:test
 run_round	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/scrypt.rs	/^    macro_rules! run_round ($/;"	M	function:salsa20_8
-run_server	/home/infiniter/Code/rpm/src/bin/rpd.rs	/^fn run_server() {$/;"	f
 run_test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aes.rs	/^    fn run_test<E: BlockEncryptor, D: BlockDecryptor>(enc: &mut E, dec: &mut D, test: &Test) {$/;"	f	module:test
 run_test	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/blockmodes.rs	/^    fn run_test<T, E, D, NewEncFunc, NewDecFunc>($/;"	f	module:test
 rust_crypto_aesni_aesimc	/home/infiniter/.cargo/registry/src/github.com-1ecc6299db9ec823/rust-crypto-0.2.36/src/aesni.rs	/^    fn rust_crypto_aesni_aesimc(round_keys: *mut u8);$/;"	f
