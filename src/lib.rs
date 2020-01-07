@@ -2,7 +2,7 @@ use std::convert::From;
 
 pub mod constants {
     pub static PASSWORD_HASH_HOLDER: &'static str = "/home/infiniter/pass_hash";
-    pub const PASS_DELAY: u64 = 5;
+    pub const PASS_DELAY: u64 = 600;
     pub static STORAGE: &'static str = "/home/infiniter/storage.db";
 
     // {{{ Enum Event

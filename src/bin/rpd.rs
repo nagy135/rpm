@@ -99,15 +99,17 @@ fn client(mut stream: TcpStream, mut validate: &mut bool) -> bool {
     let mut data = [0 as u8; 50]; // using 50 byte buffer
     match stream.read(&mut data) {
         Ok(size) => {
+            let before_validate = *validate;
             let flag = &data[0];
             let content = from_utf8(&data[1..size]).unwrap();
+            let args: Vec<&str> = content.split("#@#").collect();
+            println!("content {:?}", content);
             let response: String = match Event::from(flag) {
-                Event::New => handle_new(&mut validate),
-                Event::Get => handle_get(&mut validate),
+                Event::New => handle_new(&mut validate, &args),
+                Event::Get => handle_get(&mut validate, &args),
                 Event::Validate => handle_validate(&content, &mut validate)
             };
             let response = response.into_bytes();
-            println!("response {:?}", response);
             let mut chained_response = vec![];
             chained_response.push(*validate as u8);
             for i in response.iter(){
@@ -117,9 +119,12 @@ fn client(mut stream: TcpStream, mut validate: &mut bool) -> bool {
             let mut boxed: Box<[u8]> = chained_response.into_boxed_slice();
             println!("boxed {:?}", boxed);
             println!("flag {:?}", flag);
-            println!("content {:?}", content);
             stream.write(&boxed).unwrap();
-            *validate
+            if before_validate == false && *validate == true {
+                true
+            } else {
+                false
+            }
         },
         Err(_) => {
             println!("An error occurred, terminating connection with {}", stream.peer_addr().unwrap());
@@ -164,25 +169,22 @@ fn handle_validate(pass: &str, validate: &mut bool) -> String {
     }
 }
 
-fn handle_new(validated: &mut bool) -> String {
+fn handle_new(validated: &mut bool, args: &Vec<&str>) -> String {
+    println!("args in handle NEW {:?}", args);
     if *validated {
         return "All nice".to_string();
     } else {
         return "FUUUUUUUUUUUUCK nice".to_string();
     }
-
-    println!("handle new");
-    "new".to_string()
 }
 
-fn handle_get(validated: &mut bool) -> String {
+fn handle_get(validated: &mut bool, args: &Vec<&str>) -> String {
+    println!("args in handle get {:?}", args);
     if *validated {
         return "All nice".to_string();
     } else {
         return "FUUUUUUUUUUUUCK nice".to_string();
     }
-    println!("handle get");
-    "get".to_string()
 }
 
 // }}} handles

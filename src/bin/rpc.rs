@@ -68,23 +68,47 @@ fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
     result
 }
 
+// {{{ utils
+
+fn concat_vec(args: &Vec<String>) -> String {
+    println!("args {:?}", args);
+    let mut result = String::new();
+    for (i,arg) in args.iter().enumerate() {
+        if i > 1 {
+            result.push_str(arg);
+            if i < args.len() - 1 {
+                result.push_str("#@#");
+            }
+        }
+    }
+    result
+}
+
+// }}} utils
+
 fn new(args: &Vec<String>){
     println!("Creating new record");
-    let response = send_to_daemon(args[2].clone(), Event::New);
-    println!("{:?}", response);
+    if args.len() < 4 {
+        panic!("Need at least 4 arguments !!! new, key, password (or new, key, login, password)");
+    }
+    let response = send_to_daemon(concat_vec(&args), Event::New);
+    println!("response inside client new {:?}", response);
 }
 
 fn get(args: &Vec<String>){
     println!("Getting record from given key {:?}", args);
-    let response = send_to_daemon(args[2].clone(), Event::Get);
-    println!("{:?}", response);
+    if args.len() < 3 {
+        panic!("Need at least 3 arguments !!! get, key (returns password, login returned by --login or -l)");
+    }
+    let response = send_to_daemon(concat_vec(&args), Event::Get);
+    println!("response inside client get {:?}", response);
 }
 fn validate(){
     println!("Validating...");
     println!("Type master password: ");
     let password = read_password().unwrap();
     let response = send_to_daemon(password, Event::Validate);
-    println!("{:?}", response);
+    println!("response inside client validate {:?}", response);
 }
 fn change(){
     println!("Changing password");
