@@ -56,6 +56,7 @@ fn main() {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     // let mut validated: bool = false;
     let validated = Arc::new(Mutex::new(false));
+    let valid_password = Arc::new(Mutex::new(String));
     // accept connections and process them, spawning a new thread for each one
     println!("Server listening on port 3333");
     for stream in listener.incoming() {
@@ -66,20 +67,24 @@ fn main() {
                 let handler;
                 {
                     let validated_clone = Arc::clone(&validated);
+                    let valid_password_clone = Arc::clone(&valid_password);
                     handler = thread::spawn(move|| {
                         let mut validation_a = validated_clone.lock().unwrap();
-                        println!("validation_a {}", validation_a);
-                        client(stream, &mut validation_a)
+                        let mut valid_password_a = valid_password_clone.lock().unwrap();
+                        client(stream, &mut validation_a, &mut valid_password_a)
                     });
                 }
                 {
                     if handler.join().unwrap() {
                         let validated_clone = Arc::clone(&validated);
+                        let valid_password_clone = Arc::clone(&valid_password);
                         thread::spawn(move|| {
                             println!("Validation successfull: starting timeout");
                             thread::sleep(Duration::from_secs(constants::PASS_DELAY));
                             let mut validation_a = validated_clone.lock().unwrap();
                             *validation_a = false;
+                            let mut valid_password_a = valid_password_clone.lock().unwrap();
+                            *valid_password_a = String::from("");
                             println!("Authentication timeouted: rpm locked");
                         });
                     }
@@ -95,7 +100,7 @@ fn main() {
     drop(listener);
 }
 
-fn client(mut stream: TcpStream, mut validate: &mut bool) -> bool {
+fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &mut String) -> bool {
     let mut data = [0 as u8; 50]; // using 50 byte buffer
     match stream.read(&mut data) {
         Ok(size) => {
@@ -105,9 +110,9 @@ fn client(mut stream: TcpStream, mut validate: &mut bool) -> bool {
             let args: Vec<&str> = content.split("#@#").collect();
             println!("content {:?}", content);
             let response: String = match Event::from(flag) {
-                Event::New => handle_new(&mut validate, &args),
-                Event::Get => handle_get(&mut validate, &args),
-                Event::Validate => handle_validate(&content, &mut validate)
+                Event::New => handle_new(&mut validate, &args, &valid_password),
+                Event::Get => handle_get(&mut validate, &args, &valid_password),
+                Event::Validate => handle_validate(&content, &mut validate, &mut valid_password)
             };
             let response = response.into_bytes();
             let mut chained_response = vec![];
@@ -154,22 +159,24 @@ fn is_password_valid(pass: &str) -> Result<(), &str> {
 
 // {{{ handles
 
-fn handle_validate(pass: &str, validate: &mut bool) -> String {
+fn handle_validate(pass: &str, validate: &mut bool, valid_password: &mut String) -> String {
     let validation_res = is_password_valid(pass);
     match validation_res {
         Ok(()) => {
             *validate = true;
+            *valid_password = pass;
             "validated".to_string()
         },
         Err(reason) => {
             *validate = false;
+            *valid_password = String::from("");
             println!("reason {}", reason);
             "validation failed: password invalid".to_string()
         }
     }
 }
 
-fn handle_new(validated: &mut bool, args: &Vec<&str>) -> String {
+fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
     println!("args in handle NEW {:?}", args);
     if *validated {
         let record: Record;
@@ -193,7 +200,7 @@ fn handle_new(validated: &mut bool, args: &Vec<&str>) -> String {
     }
 }
 
-fn handle_get(validated: &mut bool, args: &Vec<&str>) -> String {
+fn handle_get(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
     println!("args in handle get {:?}", args);
     if *validated {
         return "All nice".to_string();
