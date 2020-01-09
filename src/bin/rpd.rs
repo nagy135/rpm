@@ -172,9 +172,24 @@ fn handle_validate(pass: &str, validate: &mut bool) -> String {
 fn handle_new(validated: &mut bool, args: &Vec<&str>) -> String {
     println!("args in handle NEW {:?}", args);
     if *validated {
-        return "All nice".to_string();
+        let record: Record;
+        if args.len() < 3 {
+            record = Record {
+                key: args[0].to_string(),
+                login: "".to_string(),
+                password: args[1].to_string()
+            }
+        } else {
+            record = Record {
+                key: args[0].to_string(),
+                login: args[1].to_string(),
+                password: args[2].to_string()
+            }
+        }
+        record.save();
+        return "Record saved!".to_string();
     } else {
-        return "FUUUUUUUUUUUUCK nice".to_string();
+        return "Exception: not validated".to_string();
     }
 }
 
