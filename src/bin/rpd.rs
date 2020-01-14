@@ -1,19 +1,17 @@
 extern crate crypto;
-// use std::env;
+
 use openssl::symm::{decrypt, encrypt, Cipher};
 use std::sync::{Mutex, Arc};
 use std::time::Duration;
 use std::fmt;
 use std::fs;
-use std::char;
-// use std::io;
+use std::collections::HashMap;
 use std::fs::OpenOptions;
-// use std::io::prelude::*;
-// use std::time::SystemTime;
+use std::fs::File;
+use std::io::{prelude::*, BufReader};
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use std::str::from_utf8;
-
 use std::thread;
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::{Read, Write};
@@ -27,8 +25,7 @@ use rpm::constants::Event as Event;
 #[derive(Debug)]
 struct Record {
     key     : String,
-    login   : String,
-    password: String
+    data: String
 }
 
 impl Record {
@@ -47,7 +44,7 @@ impl Record {
 }
 impl fmt::Display for Record {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} ||| {} ||| {}", self.key, self.login, self.password)
+        write!(f, "{} ||| {}", self.key, self.data)
     }
 }
 
@@ -55,10 +52,9 @@ impl fmt::Display for Record {
 
 fn main() {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
-    // let mut validated: bool = false;
     let validated = Arc::new(Mutex::new(false));
     let valid_password = Arc::new(Mutex::new(String::new()));
-    // accept connections and process them, spawning a new thread for each one
+
     println!("Server listening on port 3333");
     for stream in listener.incoming() {
         println!("========================================");
@@ -109,7 +105,7 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
             let flag = &data[0];
             let content = from_utf8(&data[1..size]).unwrap();
             let args: Vec<&str> = content.split("#@#").collect();
-            println!("content {:?}", content);
+            println!("content from client: {:?}", content);
             let response: String = match Event::from(flag) {
                 Event::New => handle_new(&mut validate, &args, &valid_password),
                 Event::Get => handle_get(&mut validate, &args, &valid_password),
@@ -123,7 +119,6 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
 
             }
             let boxed: Box<[u8]> = chained_response.into_boxed_slice();
-            println!("boxed {:?}", boxed);
             stream.write(&boxed).unwrap();
             if before_validate == false && *validate == true {
                 true
@@ -159,6 +154,27 @@ fn cut_into_pieces(data: &str) -> Vec<u8> {
     data.split("#@#").map(|num_string| num_string.parse::<u8>().unwrap()).collect()
 }
 
+fn key_used(key: &str) -> bool {
+    let storage_map = parse_storage();
+    if storage_map.contains_key(key) {
+        return true;
+    }
+    false
+}
+
+fn parse_storage() -> HashMap<String, String> {
+    let file = File::open(constants::STORAGE).unwrap();
+    let reader = BufReader::new(file);
+
+    let mut result: HashMap<String, String> = HashMap::new();
+    for line in reader.lines() {
+        let line_string = line.unwrap();
+        let values: Vec<&str> = line_string.split(" ||| ").collect();
+        result.insert(values[0].to_string(), values[1].to_string());
+    }
+    result
+}
+
 // }}} utils
 
 // {{{ handles
@@ -182,24 +198,26 @@ fn handle_validate(pass: &str, validate: &mut bool, valid_password: &mut String)
 
 fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
     if *validated {
-        let message = format!("{}   {}", args[1], args[2]);
-        let encrypted_stuff = encode(&message, &valid_password);
-        println!("encrypted_stuff {:?}", encrypted_stuff);
-        let decrypted_stuff = decode(&encrypted_stuff, &valid_password);
-        println!("decrypted_stuff {:?}", decrypted_stuff);
-        println!("args in handle NEW {:?}", args);
+        if args.len() < 2 {
+            return "Exception: Not enough arguments given".to_string();
+        }
+        if key_used(&args[0]) {
+            return "Exception: Key already used".to_string();
+        }
         let record: Record;
         if args.len() < 3 {
+            let message = args[1].to_string();
+            let encrypted_data = encode(&message, &valid_password);
             record = Record {
                 key: args[0].to_string(),
-                login: "".to_string(),
-                password: args[1].to_string()
+                data: encrypted_data
             }
         } else {
+            let message = format!("{}#@#{}", args[1], args[2]);
+            let encrypted_data = encode(&message, &valid_password);
             record = Record {
                 key: args[0].to_string(),
-                login: args[1].to_string(),
-                password: args[2].to_string()
+                data: encrypted_data
             }
         }
         record.save();
@@ -210,8 +228,11 @@ fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> S
 }
 
 fn handle_get(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
+    println!("valid_password {}", valid_password);
     println!("args in handle get {:?}", args);
     if *validated {
+        // let decrypted_stuff = decode(&encrypted_data, &valid_password);
+        // println!("decrypted_stuff {:?}", decrypted_stuff);
         return "All nice".to_string();
     } else {
         return "FUUUUUUUUUUUUCK nice".to_string();
@@ -231,7 +252,7 @@ fn decode(data: &String, key: &str) -> String {
     let ciphertext = decrypt(
         cipher,
         &key_array,
-        Some(constants::iv),
+        Some(constants::IV),
         &data_array)
         .unwrap();
     let decryted_string = from_utf8(&ciphertext[..]).unwrap();
@@ -246,7 +267,7 @@ fn encode(data: &String, key: &str) -> String {
     let ciphertext = encrypt(
         cipher,
         &key_array,
-        Some(constants::iv),
+        Some(constants::IV),
         data)
         .unwrap();
     let mut result = String::new();
