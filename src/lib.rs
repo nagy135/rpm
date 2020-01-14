@@ -4,6 +4,7 @@ pub mod constants {
     pub static PASSWORD_HASH_HOLDER: &'static str = "/home/infiniter/pass_hash";
     pub const PASS_DELAY: u64 = 600;
     pub static STORAGE: &'static str = "/home/infiniter/storage.db";
+    pub static iv: &[u8] = b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
 
     // {{{ Enum Event
     #[derive(Debug, Copy, Clone)]

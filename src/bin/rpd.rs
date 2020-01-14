@@ -1,10 +1,11 @@
 extern crate crypto;
-
 // use std::env;
+use openssl::symm::{decrypt, encrypt, Cipher};
 use std::sync::{Mutex, Arc};
 use std::time::Duration;
 use std::fmt;
 use std::fs;
+use std::char;
 // use std::io;
 use std::fs::OpenOptions;
 // use std::io::prelude::*;
@@ -56,7 +57,7 @@ fn main() {
     let listener = TcpListener::bind("0.0.0.0:3333").unwrap();
     // let mut validated: bool = false;
     let validated = Arc::new(Mutex::new(false));
-    let valid_password = Arc::new(Mutex::new(String));
+    let valid_password = Arc::new(Mutex::new(String::new()));
     // accept connections and process them, spawning a new thread for each one
     println!("Server listening on port 3333");
     for stream in listener.incoming() {
@@ -121,9 +122,8 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
                 chained_response.push(*i as u8);
 
             }
-            let mut boxed: Box<[u8]> = chained_response.into_boxed_slice();
+            let boxed: Box<[u8]> = chained_response.into_boxed_slice();
             println!("boxed {:?}", boxed);
-            println!("flag {:?}", flag);
             stream.write(&boxed).unwrap();
             if before_validate == false && *validate == true {
                 true
@@ -155,6 +155,10 @@ fn is_password_valid(pass: &str) -> Result<(), &str> {
     Ok(())
 }
 
+fn cut_into_pieces(data: &str) -> Vec<u8> {
+    data.split("#@#").map(|num_string| num_string.parse::<u8>().unwrap()).collect()
+}
+
 // }}} utils
 
 // {{{ handles
@@ -164,7 +168,7 @@ fn handle_validate(pass: &str, validate: &mut bool, valid_password: &mut String)
     match validation_res {
         Ok(()) => {
             *validate = true;
-            *valid_password = pass;
+            *valid_password = pass.to_string();
             "validated".to_string()
         },
         Err(reason) => {
@@ -177,8 +181,13 @@ fn handle_validate(pass: &str, validate: &mut bool, valid_password: &mut String)
 }
 
 fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
-    println!("args in handle NEW {:?}", args);
     if *validated {
+        let message = format!("{}   {}", args[1], args[2]);
+        let encrypted_stuff = encode(&message, &valid_password);
+        println!("encrypted_stuff {:?}", encrypted_stuff);
+        let decrypted_stuff = decode(&encrypted_stuff, &valid_password);
+        println!("decrypted_stuff {:?}", decrypted_stuff);
+        println!("args in handle NEW {:?}", args);
         let record: Record;
         if args.len() < 3 {
             record = Record {
@@ -210,3 +219,48 @@ fn handle_get(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> S
 }
 
 // }}} handles
+
+// {{{ encrypt/decrypt
+
+fn decode(data: &String, key: &str) -> String {
+    let data_array: Vec<u8> = cut_into_pieces(&data);
+    let cipher = Cipher::aes_128_cbc();
+    let key_bytes = key.as_bytes();
+    let mut key_array: [u8; 16] = [0; 16];
+    make_sure_len_16(key_bytes, &mut key_array);
+    let ciphertext = decrypt(
+        cipher,
+        &key_array,
+        Some(constants::iv),
+        &data_array)
+        .unwrap();
+    let decryted_string = from_utf8(&ciphertext[..]).unwrap();
+    decryted_string.to_string()
+}
+fn encode(data: &String, key: &str) -> String {
+    let cipher = Cipher::aes_128_cbc();
+    let key_bytes = key.as_bytes();
+    let mut key_array: [u8; 16] = [0; 16];
+    make_sure_len_16(key_bytes, &mut key_array);
+    let data = data.as_bytes();
+    let ciphertext = encrypt(
+        cipher,
+        &key_array,
+        Some(constants::iv),
+        data)
+        .unwrap();
+    let mut result = String::new();
+    for (i, num) in ciphertext.iter().enumerate() {
+        result.push_str(&num.to_string());
+        if i < ciphertext.len() - 1 {
+            result.push_str("#@#");
+        }
+    }
+    result
+}
+fn make_sure_len_16(key_bytes: &[u8], result: &mut [u8]) {
+    for i in 0..16 {
+        result[i] = key_bytes[i%key_bytes.len()];
+    }
+}
+// }}}
