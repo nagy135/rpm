@@ -5,6 +5,7 @@ use std::sync::{Mutex, Arc};
 use std::time::Duration;
 use std::fmt;
 use std::fs;
+use std::env;
 use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::fs::File;
@@ -13,6 +14,7 @@ use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use std::str::from_utf8;
 use std::thread;
+use std::path::Path;
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::io::{Read, Write};
 
@@ -30,10 +32,12 @@ struct Record {
 
 impl Record {
     fn save(&self) {
+        let root = env::var("XDG_CONFIG_HOME").unwrap();
+        let path = Path::new(root.as_str());
         let mut file = OpenOptions::new()
             .write(true)
             .append(true)
-            .open(constants::STORAGE)
+            .open(path.join(constants::STORAGE))
             .unwrap();
 
         if let Err(e) = writeln!(file, "{}", &self) {
@@ -104,12 +108,13 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
             let before_validate = *validate;
             let flag = &data[0];
             let content = from_utf8(&data[1..size]).unwrap();
-            let args: Vec<&str> = content.split("#@#").collect();
+            let mut args: Vec<&str> = content.split("#@#").collect();
             println!("content from client: {:?}", content);
             let response: String = match Event::from(flag) {
                 Event::New => handle_new(&mut validate, &args, &valid_password),
-                Event::Get => handle_get(&mut validate, &args, &valid_password),
-                Event::Validate => handle_validate(&content, &mut validate, &mut valid_password)
+                Event::Get => handle_get(&mut validate, &mut args, &valid_password),
+                Event::Validate => handle_validate(&content, &mut validate, &mut valid_password),
+                Event::List => handle_list(&mut validate)
             };
             let response = response.into_bytes();
             let mut chained_response = vec![];
@@ -139,7 +144,9 @@ fn is_password_valid(pass: &str) -> Result<(), &str> {
     let mut hasher = Sha256::new();
     hasher.input_str(pass);
     let hash = hasher.result_str();
-    let old_hash = fs::read_to_string(constants::PASSWORD_HASH_HOLDER)
+    let root = env::var("XDG_CONFIG_HOME").unwrap();
+    let path = Path::new(root.as_str());
+    let old_hash = fs::read_to_string(path.join(constants::PASSWORD_HASH_HOLDER))
         .expect("Something went wrong reading the hash file");
     if old_hash.trim().is_empty() {
         return Err("Password is empty");
@@ -163,7 +170,9 @@ fn key_used(key: &str) -> bool {
 }
 
 fn parse_storage() -> HashMap<String, String> {
-    let file = File::open(constants::STORAGE).unwrap();
+    let root = env::var("XDG_CONFIG_HOME").unwrap();
+    let path = Path::new(root.as_str());
+    let file = File::open(path.join(constants::STORAGE)).unwrap();
     let reader = BufReader::new(file);
 
     let mut result: HashMap<String, String> = HashMap::new();
@@ -175,9 +184,25 @@ fn parse_storage() -> HashMap<String, String> {
     result
 }
 
+fn has_login_flag(args: &mut Vec<&str>) -> bool {
+    let result = args.contains(&"-l");
+    args.retain(|&x| x != "-l");
+    result
+}
+
 // }}} utils
 
 // {{{ handles
+fn handle_list(validated: &mut bool ) -> String {
+    let map = parse_storage();
+    let mut response = String::new();
+    for key in map.keys() {
+        response.push_str(key);
+        response.push_str("\n");
+    }
+    response.trim_end().to_string()
+
+}
 
 fn handle_validate(pass: &str, validate: &mut bool, valid_password: &mut String) -> String {
     let validation_res = is_password_valid(pass);
@@ -227,15 +252,31 @@ fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> S
     }
 }
 
-fn handle_get(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
-    println!("valid_password {}", valid_password);
-    println!("args in handle get {:?}", args);
+fn handle_get(validated: &mut bool, mut args: &mut Vec<&str>, valid_password: &str) -> String {
+    let return_login =  has_login_flag(&mut args);
     if *validated {
-        // let decrypted_stuff = decode(&encrypted_data, &valid_password);
-        // println!("decrypted_stuff {:?}", decrypted_stuff);
-        return "All nice".to_string();
+        if ! key_used(&args[0]) {
+            return "Exception: Key does not exist".to_string();
+        }
+        let map: HashMap<String, String> = parse_storage();
+        let encrypted_data = map.get(&args[0].to_string()).unwrap();
+        let decrypted_stuff = decode(&encrypted_data, &valid_password);
+        let pieces: Vec<&str> = decrypted_stuff.split("#@#").collect();
+        if return_login {
+            if pieces.len() < 2 {
+                return "Exception: Record does not contain login data".to_string();
+            } else {
+                return pieces[0].to_string();
+            }
+        } else {
+            if pieces.len() > 1 {
+                return pieces[1].to_string();
+            } else {
+                return pieces[0].to_string();
+            }
+        }
     } else {
-        return "FUUUUUUUUUUUUCK nice".to_string();
+        return "Exception: not validated".to_string();
     }
 }
 

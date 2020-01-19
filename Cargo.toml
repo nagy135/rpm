@@ -10,6 +10,7 @@ edition = "2018"
 openssl = "0.10.9"
 rust-crypto = "0.2.36"
 rpassword = "0.0.4"
+exitcode = "1.1.2"
 
 [[bin]]
 name = "rpd"
