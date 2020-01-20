@@ -114,7 +114,7 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
                 Event::New => handle_new(&mut validate, &args, &valid_password),
                 Event::Get => handle_get(&mut validate, &mut args, &valid_password),
                 Event::Validate => handle_validate(&content, &mut validate, &mut valid_password),
-                Event::List => handle_list(&mut validate)
+                Event::List => handle_list()
             };
             let response = response.into_bytes();
             let mut chained_response = vec![];
@@ -193,7 +193,7 @@ fn has_login_flag(args: &mut Vec<&str>) -> bool {
 // }}} utils
 
 // {{{ handles
-fn handle_list(validated: &mut bool ) -> String {
+fn handle_list() -> String {
     let map = parse_storage();
     let mut response = String::new();
     for key in map.keys() {

@@ -1,4 +1,3 @@
-use std::convert::From;
 
 pub mod constants {
     pub static PASSWORD_HASH_HOLDER: &'static str = "rpm/pass_hash";
