@@ -4,13 +4,13 @@ Simple client/server password manager that keeps you logged in for few minutes a
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+This project exists because at work I often connect to different machines and gui interfaces and I wanted simple rofi-based solution that would get me credentials into clipboard to simply paste it there. In the same time I wanted to get into rust language, so i made this. Whole idea is to get the password safely and without typing master password constantly. Therefore program is separated into two binaries, one that runs in the background (rpd - daemon - server) that holds your password and does all the heavy lifting and client (rpc) that simply communicates with it. Prefered way of using this program is with given rofi bash script.
 
-### Prerequisites
+## Prerequisites
 
 All necessary packages are handled by rust's cargo. Only thing you need, is to have rofi installed if you want to use it. Program functions with CLI as well, rofi is just the most handy way to use it.
 
-### Installing
+## Installing
 
 Installing process is very simple.
 
@@ -26,7 +26,7 @@ make
 sudo make install
 ```
 
-### Usage
+## Usage
 Program consists of 2 parts:
 * rpc - client
 * rpd - daemon
@@ -70,16 +70,16 @@ rpc list
 If rofi is installed, you can use `rpm_rofi` script to do all of above via rofi interface.
 If validation is needed, rofi will give you prompt. If not you can choose from keys and retrieve password (or login with `rpm_rofi -l`) to the clipboard.
 
-### TODO
+## TODO
 * avoid user to simply remove password_hash and use init
 * allow changing of records
 * change validation messages for user
 * add another features to rofi
 
-### License
+## License
 
 This project is licensed under the DO_WTF_U_WANT_WITH_IT License.
 
-### Acknowledgments
+## Acknowledgments
 
 Project is under initial development. PRs are welcome !
