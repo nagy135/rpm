@@ -46,7 +46,7 @@ After your password is set, you need to validate:
 rpc validate
 ```
 
-This will validate your actions for next 10 minutes.
+This will prompt you for your password and validate your actions for next 10 minutes.
 After that you can create new records:
 ```
 rpc new my_key my_password
@@ -70,6 +70,11 @@ rpc list
 If rofi is installed, you can use `rpm_rofi` script to do all of above via rofi interface.
 If validation is needed, rofi will give you prompt. If not you can choose from keys and retrieve password (or login with `rpm_rofi -l`) to the clipboard.
 
+### TODO
+* avoid user to simply remove password_hash and use init
+* allow changing of records
+* change validation messages for user
+* add another features to rofi
 
 ### License
 
