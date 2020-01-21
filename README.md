@@ -4,11 +4,15 @@ Simple client/server password manager that keeps you logged in for few minutes a
 
 ## Getting Started
 
-This project exists because at work I often connect to different machines and gui interfaces and I wanted simple rofi-based solution that would get me credentials into clipboard to simply paste it there. In the same time I wanted to get into rust language, so i made this. Whole idea is to get the password safely and without typing master password constantly. Therefore program is separated into two binaries, one that runs in the background (rpd - daemon - server) that holds your password and does all the heavy lifting and client (rpc) that simply communicates with it. Prefered way of using this program is with given rofi bash script.
+This project exists because at work I often connect to different machines and gui interfaces and I wanted simple rofi-based solution that would get me credentials into clipboard to simply paste it there. In the same time I wanted to get into rust language, so i made this. Whole idea is to get the password safely and without typing master password constantly. Therefore rpm is separated into two binaries, one that runs in the background (rpd - daemon - server) that holds your password and does all the heavy lifting and client (rpc) that simply communicates with it. Prefered way of using this rpm is with given rofi bash script.
 
 ## Prerequisites
 
 All necessary packages are handled by rust's cargo. Only thing you need, is to have rofi installed if you want to use it. Program functions with CLI as well, rofi is just the most handy way to use it.
+
+## Safety
+
+Rpm uses symmetric encryption via AES (Advanced Encryption Standard). This means that there exists one key (user's master password) that is used both to encrypt the data, as well as to decrypt it. Rpd (daemon part of the program) holds this key internally and invalidates it after timeout ran in separate thread.
 
 ## Installing
 
