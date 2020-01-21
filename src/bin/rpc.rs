@@ -31,13 +31,14 @@ fn run_app() -> Result<String, String>{
             "get" => get(&args),
             "validate" => validate(&args),
             "change" => change(),
+            "init" => init(),
             "list" => list(),
             "--help" => help(),
             _ => Err("Unknown command...try --help".to_string())
         };
         return response;
     }
-    Err(String::from(""))
+    Err(String::from("No command specified...try --help"))
 }
 
 fn first_zero(data: &[u8; 100]) -> usize {
@@ -65,7 +66,10 @@ fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
                     let validated = &data[0];
                     let text = from_utf8(&data[1..zero_index]).unwrap().to_string();
                     if *validated == 0 {
-                        result = Err("Validation failed!!!".to_string());
+                        match event {
+                            Event::Init => result = Ok(text.clone()),
+                            _           => result = Err("Validation failed! use validate command".to_string())
+                        }
                     } else {
                         result = Ok(text.clone());
                     }
@@ -127,8 +131,18 @@ fn validate(args: &Vec<String>) -> Result<String, String>{
     let response = send_to_daemon(password, Event::Validate);
     response
 }
+fn init() -> Result<String, String>{
+    println!("Type INITIAL master password (works only first time): ");
+    let init_password = read_password().unwrap();
+    let response = send_to_daemon(init_password, Event::Init);
+    response
+}
+
 fn change() -> Result<String, String>{
-    Err(String::from("Not impelemted yet"))
+    println!("Type NEW master password: ");
+    let new_password = read_password().unwrap();
+    let response = send_to_daemon(new_password, Event::ChangeMP);
+    response
 }
 fn list() -> Result<String, String>{
     let response = send_to_daemon("".to_string(),  Event::List);

@@ -5,13 +5,28 @@ pub mod constants {
     pub static STORAGE: &'static str = "rpm/storage.db";
     pub static IV: &[u8] = b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
 
+    pub enum Reason {
+        PasswordEmpty,
+        PasswordInvalid
+    }
+    impl Reason {
+        pub fn to_string(&self) -> String {
+            match self {
+                PasswordInvalid => String::from("Password is invalid"),
+                PasswordEmpty => String::from("Password is empty")
+            }
+        }
+    }
+
     // {{{ Enum Event
     #[derive(Debug, Copy, Clone)]
     pub enum Event {
         New = 1,
         Get = 2,
         Validate = 3,
-        List = 4
+        List = 4,
+        ChangeMP = 5,
+        Init = 6
     }
     impl Event {
         pub fn to_u8(&self) -> u8 {
@@ -25,6 +40,8 @@ pub mod constants {
                 2 => Event::Get,
                 3 => Event::Validate,
                 4 => Event::List,
+                5 => Event::ChangeMP,
+                6 => Event::Init,
                 _ => Event::Validate
             }
         }

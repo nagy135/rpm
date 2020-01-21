@@ -20,6 +20,7 @@ use std::io::{Read, Write};
 
 use rpm::constants;
 use rpm::constants::Event as Event;
+use rpm::constants::Reason as Reason;
 
 
 // {{{ RECORD IMPLEMENTATION
@@ -114,6 +115,8 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
                 Event::New => handle_new(&mut validate, &args, &valid_password),
                 Event::Get => handle_get(&mut validate, &mut args, &valid_password),
                 Event::Validate => handle_validate(&content, &mut validate, &mut valid_password),
+                Event::ChangeMP => handle_change_mp(&content, &mut validate),
+                Event::Init => handle_init(&content),
                 Event::List => handle_list()
             };
             let response = response.into_bytes();
@@ -140,7 +143,25 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
 }
 
 // {{{ utils
-fn is_password_valid(pass: &str) -> Result<(), &str> {
+fn set_password(pass: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.input_str(pass);
+    let hash = hasher.result_str();
+    let root = env::var("XDG_CONFIG_HOME").unwrap();
+    let path = Path::new(root.as_str());
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(path.join(constants::PASSWORD_HASH_HOLDER))
+        .unwrap();
+
+    if let Err(e) = writeln!(file, "{}", &hash) {
+        panic!("Couldn't write to hash holder file: {}", e);
+    }
+    "Password set to given value".to_string()
+}
+
+fn is_password_valid(pass: &str) -> Result<(), Reason> {
     let mut hasher = Sha256::new();
     hasher.input_str(pass);
     let hash = hasher.result_str();
@@ -149,10 +170,10 @@ fn is_password_valid(pass: &str) -> Result<(), &str> {
     let old_hash = fs::read_to_string(path.join(constants::PASSWORD_HASH_HOLDER))
         .expect("Something went wrong reading the hash file");
     if old_hash.trim().is_empty() {
-        return Err("Password is empty");
+        return Err(Reason::PasswordEmpty);
     }
     if hash != old_hash.trim() {
-        return Err("Your password does not match !!!");
+        return Err(Reason::PasswordInvalid);
     }
     Ok(())
 }
@@ -204,19 +225,41 @@ fn handle_list() -> String {
 
 }
 
-fn handle_validate(pass: &str, validate: &mut bool, valid_password: &mut String) -> String {
+fn handle_init(pass: &str) -> String {
     let validation_res = is_password_valid(pass);
     match validation_res {
         Ok(()) => {
-            *validate = true;
-            *valid_password = pass.to_string();
-            "validated".to_string()
+            "Given password already matches current one, nothing changed".to_string()
         },
         Err(reason) => {
-            *validate = false;
+            match reason {
+                Reason::PasswordInvalid => "Password already set, to change it, use change command".to_string(),
+                Reason::PasswordEmpty => set_password(pass)
+            }
+        }
+    }
+}
+
+fn handle_change_mp(pass: &str, validated: &mut bool) -> String {
+    if *validated {
+        return set_password(pass)
+    } else {
+        "Not validated".to_string()
+    }
+}
+
+fn handle_validate(pass: &str, validated: &mut bool, valid_password: &mut String) -> String {
+    let validation_res = is_password_valid(pass);
+    match validation_res {
+        Ok(()) => {
+            *validated = true;
+            *valid_password = pass.to_string();
+            "Successfully validated".to_string()
+        },
+        Err(reason) => {
+            *validated = false;
             *valid_password = String::from("");
-            println!("reason {}", reason);
-            "validation failed: password invalid".to_string()
+            reason.to_string()
         }
     }
 }

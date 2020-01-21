@@ -1,21 +1,19 @@
 #!/bin/bash
 
-rpc=target/debug/rpc
-rpd=target/debug/rpd
+rpc=/usr/bin/rpc
+rpd=/usr/bin/rpd
 
-$rpc get test > /dev/null
+$rpc get test &> /dev/null
 if [[ $? -gt 0 ]]; then
     pass=$(echo "$keys" | rofi -dmenu -password -theme input.rasi -i -p "Master Password")
     $rpc validate $pass
     [[ $? -gt 0 ]] && notify-send -i none -t 2000 "RPM" "wrong password" && exit 1
 fi
 
-
 keys=$($rpc list)
-
 
 chosen=$(echo "$keys" | rofi -dmenu -theme "~/.config/rofi/tmux.rasi" -i -p "Choose password key")
 
 if [[ $chosen != "" ]]; then
-    echo $($rpc get $chosen) |  tr -d '\n' | xclip -sel clipboard
+    echo $($rpc get $chosen $1) |  tr -d '\n' | xclip -sel clipboard
 fi
