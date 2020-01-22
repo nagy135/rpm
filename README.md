@@ -4,7 +4,7 @@ Simple client/server password manager that keeps you logged in for few minutes a
 
 ## Getting Started
 
-This project exists because at work I often connect to different machines and gui interfaces and I wanted simple rofi-based solution that would get me credentials into clipboard to simply paste it there. In the same time I wanted to get into rust language, so i made this. Whole idea is to get the password safely and without typing master password constantly. Therefore rpm is separated into two binaries, one that runs in the background (rpd - daemon - server) that holds your password and does all the heavy lifting and client (rpc) that simply communicates with it. Prefered way of using this rpm is with given rofi bash script.
+This project exists because at work I often connect to different machines and gui interfaces and I wanted simple rofi-based solution that would get me credentials into clipboard to simply paste it there. In the same time I wanted to get into rust language, so i made this. Whole idea is to get the password safely and without typing master password constantly. Therefore rpm is separated into two binaries, one that runs in the background (rpd - daemon - server) that holds your password and does all the heavy lifting and client (rpc) that simply communicates with it. Prefered way of using rpm is with given rofi bash script.
 
 ## Prerequisites
 
@@ -73,6 +73,15 @@ rpc list
 ## Rofi
 If rofi is installed, you can use `rpm_rofi` script to do all of above via rofi interface.
 If validation is needed, rofi will give you prompt. If not you can choose from keys and retrieve password (or login with `rpm_rofi -l`) to the clipboard.
+
+## Contributing
+I m planning to improve this password manager for my personal use, but any PRs are welcome and encouraged. This project gets you into multiple different topics you might want to know about rust:
+* Encryption
+* Multithreading (with shared memory)
+* Server/Client architecture
+* ...
+
+This project was created with multiple weeks-long breaks, therefore my whole ideas might be inconsistent across whole project. I plan on refactoring it in future, but keep it at mind !
 
 ## TODO
 * avoid user to simply remove password_hash and use init (probably just wipe records if init is used)
