@@ -75,8 +75,9 @@ If rofi is installed, you can use `rpm_rofi` script to do all of above via rofi 
 If validation is needed, rofi will give you prompt. If not you can choose from keys and retrieve password (or login with `rpm_rofi -l`) to the clipboard.
 
 ## TODO
-* avoid user to simply remove password_hash and use init
+* avoid user to simply remove password_hash and use init (probably just wipe records if init is used)
 * allow changing of records
+* allow deletion of records
 * change validation messages for user
 * add another features to rofi
 
