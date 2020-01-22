@@ -116,6 +116,7 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
                 Event::Get => handle_get(&mut validate, &mut args, &valid_password),
                 Event::Validate => handle_validate(&content, &mut validate, &mut valid_password),
                 Event::ChangeMP => handle_change_mp(&content, &mut validate),
+                Event::Delete => handle_delete(&mut validate, &args),
                 Event::Init => handle_init(&content),
                 Event::List => handle_list()
             };
@@ -188,6 +189,24 @@ fn key_used(key: &str) -> bool {
         return true;
     }
     false
+}
+
+fn write_storage(map: HashMap<String, String>) {
+    let root = env::var("XDG_CONFIG_HOME").unwrap();
+    let path = Path::new(root.as_str());
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(path.join(constants::STORAGE))
+        .unwrap();
+
+    file.set_len(0).expect("Could not wipe file");
+
+    for (key, val) in map {
+        if let Err(e) = writeln!(file, "{} ||| {}", key, val) {
+            panic!("Couldn't write to file: {}", e);
+        }
+    }
 }
 
 fn parse_storage() -> HashMap<String, String> {
@@ -290,6 +309,19 @@ fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> S
         }
         record.save();
         return "Record saved!".to_string();
+    } else {
+        return "Exception: not validated".to_string();
+    }
+}
+fn handle_delete(validated: &mut bool, args: &Vec<&str>) -> String {
+    if *validated {
+        if ! key_used(&args[0]) {
+            return "Exception: Key does not exist".to_string();
+        }
+        let mut map: HashMap<String, String> = parse_storage();
+	map.remove(args[0]);
+	write_storage(map);
+        return "Record successfully deleted".to_string();
     } else {
         return "Exception: not validated".to_string();
     }

@@ -92,7 +92,7 @@ This project was created with multiple weeks-long breaks, therefore my whole ide
 ## TODO
 * avoid user to simply remove password_hash and use init (probably just wipe records if init is used)
 * allow changing of records
-* allow deletion of records
+* allow deletion of records (done)
 * change validation messages for user
 * add another features to rofi
 

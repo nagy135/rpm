@@ -29,6 +29,7 @@ fn run_app() -> Result<String, String>{
         let response = match command.as_ref() {
             "new" => new(&args),
             "get" => get(&args),
+            "delete" => delete(&args),
             "validate" => validate(&args),
             "change" => change(),
             "init" => init(),
@@ -118,6 +119,14 @@ fn get(args: &Vec<String>) -> Result<String, String>{
         return Err("Need at least 3 arguments !!! get, key (returns password, login returned by -l flag)".to_string());
     }
     let response = send_to_daemon(concat_vec(&args), Event::Get);
+    response
+}
+
+fn delete(args: &Vec<String>) -> Result<String, String>{
+    if args.len() < 3 {
+        return Err("Need 2 arguments, delete and key of record which we try to delete".to_string());
+    }
+    let response = send_to_daemon(concat_vec(&args), Event::Delete);
     response
 }
 fn validate(args: &Vec<String>) -> Result<String, String>{
