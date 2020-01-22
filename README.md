@@ -56,7 +56,7 @@ After that you can create new records:
 rpc new my_key my_password
 rpc new my_key my_login my_password
 ```
-Your shell might interpret some symbols differently...enclose arguments with special characters in single quotes. This should solve all the cases except for cases where you want single quote inside ur password/login. Then you need to escape it with backslash:
+**Your shell might interpret some symbols differently**...enclose arguments with special characters in single quotes. This should solve all the cases except for cases where you want single quote inside ur password/login. Then you need to escape it with backslash:
 ```
 # wont work (just some of problematic symbols)
 rpc new my_key special_*$#!:_symbols
@@ -93,7 +93,7 @@ This project was created with multiple weeks-long breaks, therefore my whole ide
 ## TODO
 * avoid user to simply remove password_hash and use init (probably just wipe records if init is used)
 * allow changing of records
-* allow deletion of records (done)
+* ~~allow deletion of records~~
 * change validation messages for user
 * add another features to rofi
 
