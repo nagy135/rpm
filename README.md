@@ -56,12 +56,13 @@ After that you can create new records:
 rpc new my_key my_password
 rpc new my_key my_login my_password
 ```
-*Your shell might interpret some symbols differently* ...enclose arguments with special characters in single quotes. This should solve all the cases except for cases where you want single quote inside ur password/login. Then you need to escape it with backslash:
+Your shell might interpret some symbols differently...enclose arguments with special characters in single quotes. This should solve all the cases except for cases where you want single quote inside ur password/login. Then you need to escape it with backslash:
 ```
 # wont work (just some of problematic symbols)
 rpc new my_key special_*$#!:_symbols
 # will work
 rpc new my_key 'special_*$#!:_symbols'
+```
 
 where second argument can be password, or login...you can either use it just to store password, or login as well.
 Data is retrieved by:
