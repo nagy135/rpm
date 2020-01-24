@@ -95,7 +95,7 @@ This project was created with multiple weeks-long breaks, therefore my whole ide
 * allow changing of records
 * ~~allow deletion of records~~
 * change validation messages for user
-* add another features to rofi
+* ~~add another features to rofi~~
 * ~~provide .rasi rofi themes in user's config for modification~~
 
 ## License
