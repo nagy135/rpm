@@ -11,9 +11,7 @@ build:
 	touch $(XDG_CONFIG_HOME)/rpm/pass_hash
 	chmod 777 $(XDG_CONFIG_HOME)/rpm/storage.db
 	chmod 777 $(XDG_CONFIG_HOME)/rpm/pass_hash
-
-testuj:
-	mkdir -p "$(XDG_CONFIG_HOME)/rpm"
+	cp -R rofi_themes $(XDG_CONFIG_HOME)/rpm
 
 install:
 	mkdir -p $(PREFIX)/bin
