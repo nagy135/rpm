@@ -3,17 +3,81 @@
 rpc=/usr/bin/rpc
 rpd=/usr/bin/rpd
 
-$rpc get test &> /dev/null
-if [[ $? -gt 0 ]]; then
-    pass=$(echo "$keys" | rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Master Password")
-    $rpc validate $pass
-    [[ $? -gt 0 ]] && notify-send -i none -t 2000 "RPM" "wrong password" && exit 1
-fi
+# {{{ handlers
+login_handler(){
+    is_running
+    is_validated
+    keys=$($rpc list)
+    check_if_any_records $keys
+    chosen=$(echo "$keys" | rofi -dmenu -theme "~/.config/rpm/rofi_themes/list.rasi" -i -p "Choose key (login)")
+    [[ -z $chosen ]] && notify-send -i none -t 2000 "RPM" "no key chosen, exiting..." && exit 1
+    echo $($rpc get $chosen -l) |  tr -d '\n' | xclip -sel clipboard
+}
+pass_handler(){
+    is_running
+    is_validated
+    keys=$($rpc list)
+    check_if_any_records $keys
+    chosen=$(echo "$keys" | rofi -dmenu -theme "~/.config/rpm/rofi_themes/list.rasi" -i -p "Choose key (password)")
+    [[ -z $chosen ]] && notify-send -i none -t 2000 "RPM" "no key chosen, exiting..." && exit 1
+    echo $($rpc get $chosen) |  tr -d '\n' | xclip -sel clipboard
+}
+delete_handler(){
+    is_running
+    is_validated
+    keys=$($rpc list)
+    check_if_any_records $keys
+    chosen=$(echo "$keys" | rofi -dmenu -theme "~/.config/rpm/rofi_themes/warning.rasi" -i -p "Choose key (delete)")
+    [[ -z $chosen ]] && notify-send -i none -t 2000 "RPM" "no key chosen, exiting..." && exit 1
+    $rpc delete $chosen && notify-send -i none -t 2000 "RPM" "Record deleted" && exit 1
+}
+help_handler(){
+    echo "Usage: rpm_rofi [option...]" >&2
+    echo
+    echo "   no argument                put password into clipboard"
+    echo "   -l, --login                put login(if exists) into clipboard instead"
+    echo "   -d, --delete               delete record by chosen key"
+    echo "   -h, --help                 print this message"
+    echo
+    exit 1
+}
+# }}}
 
-keys=$($rpc list)
+# {{{ utils
+check_if_any_records(){
+    [[ $(echo "$1" | tr -d '\n' | wc -w) -eq 0 ]] && notify-send -i none -t 2000 "RPM" "No record available...create some first" && exit 1
+}
+is_running(){
+    pidof rpd &> /dev/null
+    if [[ $? -gt 0 ]]; then
+        notify-send -t 2000 -i none "RPM" "RPD is not running. Run rpd &"
+        exit 1
+    fi
+}
 
-chosen=$(echo "$keys" | rofi -dmenu -theme "~/.config/rpm/rofi_themes/list.rasi" -i -p "Choose password key")
+is_validated(){
+    $rpc get test &> /dev/null
+    if [[ $? -gt 0 ]]; then
+        # need to validate first
+        pass=$(echo "$keys" | rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Master Password")
+        [[ -z $pass ]] && notify-send -i none -t 2000 "RPM" "No password provided, exiting..." && exit 1
+        $rpc validate $pass
+        [[ $? -gt 0 ]] && notify-send -i none -t 2000 "RPM" "wrong password" && exit 1
+    fi
+}
+# }}}
 
-if [[ $chosen != "" ]]; then
-    echo $($rpc get $chosen $1) |  tr -d '\n' | xclip -sel clipboard
-fi
+case $1 in
+    -l|--login)
+        login_handler
+        ;;
+    -d|--delete)
+        delete_handler
+        ;;
+    -h|--help)
+        help_handler
+        ;;
+    *)
+        pass_handler
+        ;;
+esac
