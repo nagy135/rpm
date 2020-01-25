@@ -91,8 +91,8 @@ I m planning to improve this password manager for my personal use, but any PRs a
 This project was created with multiple weeks-long breaks, therefore my whole ideas might be inconsistent across whole project. I plan on refactoring it in future, but keep it at mind !
 
 ## TODO
-* avoid user to simply remove password_hash and use init (probably just wipe records if init is used)
-* allow changing of records
+* ~~avoid user to simply remove password_hash and use init (probably just wipe records if init is used)~~
+* ~~allow changing of records~~
 * ~~allow deletion of records~~
 * change validation messages for user
 * ~~add another features to rofi~~
