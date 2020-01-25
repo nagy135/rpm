@@ -73,7 +73,7 @@ fn main() {
                     handler = thread::spawn(move|| {
                         let mut validation_a = validated_clone.lock().unwrap();
                         let mut valid_password_a = valid_password_clone.lock().unwrap();
-                        client(stream, &mut validation_a, &mut valid_password_a)
+                        client(stream, &mut validation_a,  &mut valid_password_a)
                     });
                 }
                 {
@@ -144,7 +144,7 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
 }
 
 // {{{ utils
-fn set_password(pass: &str) -> String {
+fn set_password(pass: &str, wipe_storage: bool) -> String {
     let mut hasher = Sha256::new();
     hasher.input_str(pass);
     let hash = hasher.result_str();
@@ -158,6 +158,14 @@ fn set_password(pass: &str) -> String {
 
     if let Err(e) = writeln!(file, "{}", &hash) {
         panic!("Couldn't write to hash holder file: {}", e);
+    }
+    if wipe_storage {
+        let file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open(path.join(constants::STORAGE))
+            .unwrap();
+        file.set_len(0).expect("Could not wipe storate");
     }
     "Password set to given value".to_string()
 }
@@ -252,8 +260,8 @@ fn handle_init(pass: &str) -> String {
         },
         Err(reason) => {
             match reason {
-                Reason::PasswordInvalid => "Password already set, to change it, use change command".to_string(),
-                Reason::PasswordEmpty => set_password(pass)
+                Reason::PasswordInvalid => reason.to_string(),
+                Reason::PasswordEmpty => set_password(pass, true)
             }
         }
     }
@@ -261,7 +269,7 @@ fn handle_init(pass: &str) -> String {
 
 fn handle_change_mp(pass: &str, validated: &mut bool) -> String {
     if *validated {
-        return set_password(pass)
+        return set_password(pass, false)
     } else {
         "Not validated".to_string()
     }

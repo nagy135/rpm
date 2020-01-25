@@ -141,7 +141,7 @@ fn validate(args: &Vec<String>) -> Result<String, String>{
     response
 }
 fn init() -> Result<String, String>{
-    println!("Type INITIAL master password (works only first time): ");
+    println!("Type INITIAL master password (removes all records from storage): ");
     let init_password = read_password().unwrap();
     let response = send_to_daemon(init_password, Event::Init);
     response
