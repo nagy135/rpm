@@ -31,7 +31,8 @@ fn run_app() -> Result<String, String>{
             "get" => get(&args),
             "delete" => delete(&args),
             "validate" => validate(&args),
-            "change" => change(),
+            "changeMP" => change_mp(),
+            "change" => change(&args),
             "init" => init(),
             "list" => list(),
             "--help" => help(),
@@ -147,10 +148,17 @@ fn init() -> Result<String, String>{
     response
 }
 
-fn change() -> Result<String, String>{
+fn change_mp() -> Result<String, String>{
     println!("Type NEW master password: ");
     let new_password = read_password().unwrap();
     let response = send_to_daemon(new_password, Event::ChangeMP);
+    response
+}
+fn change(args: &Vec<String>) -> Result<String, String>{
+    if args.len() < 4 {
+        return Err("Need at least 4 arguments !!! change, key, password (or new, key, login, password)".to_string());
+    }
+    let response = send_to_daemon(concat_vec(&args), Event::Change);
     response
 }
 fn list() -> Result<String, String>{
@@ -166,7 +174,7 @@ commands: [new, get, validate, change, list]
     new          - checks validation, prompts for key then password and saves hashed
     get [-l] key - checks validation, returns unencrypted password (or login with -l)
     validate     - prompts for master password and unlocks for PASS_DELAY seconds
-    change       - prompts for old master pass and then new twice
+    changeMP     - prompts for old master pass and then new twice
     list         - prints all keys for rofi integration
     ");
     Ok(String::new())

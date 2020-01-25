@@ -22,12 +22,13 @@ pub mod constants {
     #[derive(Debug, Copy, Clone)]
     pub enum Event {
         New = 1,
-        Get = 2, 
+        Get = 2,
         Validate = 3,
         List = 4,
         ChangeMP = 5,
         Init = 6,
-        Delete = 7
+        Delete = 7,
+        Change = 8,
     }
     impl Event {
         pub fn to_u8(&self) -> u8 {
@@ -44,6 +45,7 @@ pub mod constants {
                 5 => Event::ChangeMP,
                 6 => Event::Init,
                 7 => Event::Delete,
+                8 => Event::Change,
                 _ => Event::Validate
             }
         }

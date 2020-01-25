@@ -103,6 +103,7 @@ fn main() {
 }
 
 fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &mut String) -> bool {
+
     let mut data = [0 as u8; 50]; // using 50 byte buffer
     match stream.read(&mut data) {
         Ok(size) => {
@@ -110,13 +111,13 @@ fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &m
             let flag = &data[0];
             let content = from_utf8(&data[1..size]).unwrap();
             let mut args: Vec<&str> = content.split("#@#").collect();
-            println!("content from client: {:?}", content);
             let response: String = match Event::from(flag) {
                 Event::New => handle_new(&mut validate, &args, &valid_password),
                 Event::Get => handle_get(&mut validate, &mut args, &valid_password),
                 Event::Validate => handle_validate(&content, &mut validate, &mut valid_password),
                 Event::ChangeMP => handle_change_mp(&content, &mut validate),
                 Event::Delete => handle_delete(&mut validate, &args),
+                Event::Change => handle_change(&mut validate, &args, &valid_password),
                 Event::Init => handle_init(&content),
                 Event::List => handle_list()
             };
@@ -321,6 +322,27 @@ fn handle_new(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> S
         return "Exception: not validated".to_string();
     }
 }
+fn handle_change(validated: &mut bool, args: &Vec<&str>, valid_password: &str) -> String {
+    if *validated {
+        if ! key_used(&args[0]) {
+            return "Exception: Key does not exist".to_string();
+        }
+        let mut map: HashMap<String, String> = parse_storage();
+        if args.len() < 3 {
+            let message = args[1].to_string();
+            let encrypted_data = encode(&message, &valid_password);
+            map.insert(args[0].to_string(), encrypted_data);
+        } else {
+            let message = format!("{}#@#{}", args[1], args[2]);
+            let encrypted_data = encode(&message, &valid_password);
+            map.insert(args[0].to_string(), encrypted_data);
+        }
+	write_storage(map);
+        return "Record successfully updated".to_string();
+    } else {
+        return "Exception: not validated".to_string();
+    }
+}
 fn handle_delete(validated: &mut bool, args: &Vec<&str>) -> String {
     if *validated {
         if ! key_used(&args[0]) {
@@ -347,7 +369,7 @@ fn handle_get(validated: &mut bool, mut args: &mut Vec<&str>, valid_password: &s
         let pieces: Vec<&str> = decrypted_stuff.split("#@#").collect();
         if return_login {
             if pieces.len() < 2 {
-                return "Exception: Record does not contain login data".to_string();
+                return "".to_string();
             } else {
                 return pieces[0].to_string();
             }
