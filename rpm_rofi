@@ -29,11 +29,20 @@ new_handler(){
     key=$(rofi -dmenu -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "New key")
     [[ $(echo "$keys" | grep $key | wc -l) -ne 0 ]] && notify-send -i none -t 2000 "RPM" "key already exists, exiting..." && exit 1
     login=$(rofi -dmenu -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Login")
-    echo "login" $login
     pass=$(rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Password")
-    echo "pass" $pass
     [[ -z $pass ]] && notify-send -i none -t 2000 "RPM" "no password chosen, exiting..." && exit 1
     $rpc new "$key" "$login" "$pass"
+}
+change_handler(){
+    is_running
+    is_validated
+    keys=$($rpc list)
+    key=$(echo "$keys" | rofi -dmenu -theme "~/.config/rpm/rofi_themes/list.rasi" -i -p "Choose key (to change)")
+    [[ -z $key ]] && notify-send -i none -t 2000 "RPM" "no key chosen, exiting..." && exit 1
+    login=$(rofi -dmenu -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Login")
+    pass=$(rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Password")
+    [[ -z $pass ]] && notify-send -i none -t 2000 "RPM" "no password chosen, exiting..." && exit 1
+    $rpc change "$key" "$login" "$pass"
 }
 delete_handler(){
     is_running
@@ -92,6 +101,9 @@ case $1 in
         ;;
     -n|--new)
         new_handler
+        ;;
+    -ch|--change)
+        change_handler
         ;;
     *)
         pass_handler
