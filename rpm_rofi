@@ -22,6 +22,19 @@ pass_handler(){
     [[ -z $chosen ]] && notify-send -i none -t 2000 "RPM" "no key chosen, exiting..." && exit 1
     echo $($rpc get $chosen) |  tr -d '\n' | xclip -sel clipboard
 }
+new_handler(){
+    is_running
+    is_validated
+    keys=$($rpc list)
+    key=$(rofi -dmenu -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "New key")
+    [[ $(echo "$keys" | grep $key | wc -l) -ne 0 ]] && notify-send -i none -t 2000 "RPM" "key already exists, exiting..." && exit 1
+    login=$(rofi -dmenu -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Login")
+    echo "login" $login
+    pass=$(rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Password")
+    echo "pass" $pass
+    [[ -z $pass ]] && notify-send -i none -t 2000 "RPM" "no password chosen, exiting..." && exit 1
+    $rpc new "$key" "$login" "$pass"
+}
 delete_handler(){
     is_running
     is_validated
@@ -59,7 +72,7 @@ is_validated(){
     $rpc get test &> /dev/null
     if [[ $? -gt 0 ]]; then
         # need to validate first
-        pass=$(echo "$keys" | rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Master Password")
+        pass=$(rofi -dmenu -password -theme ~/.config/rpm/rofi_themes/input.rasi -i -p "Master Password")
         [[ -z $pass ]] && notify-send -i none -t 2000 "RPM" "No password provided, exiting..." && exit 1
         $rpc validate $pass
         [[ $? -gt 0 ]] && notify-send -i none -t 2000 "RPM" "wrong password" && exit 1
@@ -76,6 +89,9 @@ case $1 in
         ;;
     -h|--help)
         help_handler
+        ;;
+    -n|--new)
+        new_handler
         ;;
     *)
         pass_handler
