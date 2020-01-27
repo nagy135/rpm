@@ -80,6 +80,7 @@ rpc list
 ## Rofi
 If rofi is installed, you can use `rpm_rofi` script to do all of above via rofi interface.
 If validation is needed, rofi will give you prompt. If not you can choose from keys and retrieve password (or login with `rpm_rofi -l`) to the clipboard.
+Rofi script supports all of the functionality, try `rpm_rofi --help`
 
 ## Contributing
 I m planning to improve this password manager for my personal use, but any PRs are welcome and encouraged. This project gets you into multiple different topics you might want to know about rust:
@@ -88,7 +89,7 @@ I m planning to improve this password manager for my personal use, but any PRs a
 * Server/Client architecture
 * ...
 
-This project was created with multiple weeks-long breaks, therefore my whole ideas might be inconsistent across whole project. I plan on refactoring it in future, but keep it at mind !
+This project was created with multiple weeks-long breaks, therefore my ideas might be inconsistent across entire project. I plan on refactoring it in future, but keep it in mind !
 
 ## TODO
 * ~~avoid user to simply remove password_hash and use init (probably just wipe records if init is used)~~
