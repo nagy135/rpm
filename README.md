@@ -30,6 +30,8 @@ make
 sudo make install
 ```
 
+Make sure your `XDG_CONFIG_HOME` environment variable is set. This is the location where all the data is stored, as well as themes. Unless you changed it, it should point to `~/.config`.
+
 ## Usage
 Program consists of 2 parts:
 * rpc - client
