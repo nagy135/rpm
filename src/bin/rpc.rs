@@ -43,13 +43,13 @@ fn run_app() -> Result<String, String>{
     Err(String::from("No command specified...try --help"))
 }
 
-fn first_zero(data: &[u8; 100]) -> usize {
-    for i in 1..100 { // skipping first index, might be validation zero
+fn first_zero(data: &[u8; 200]) -> usize {
+    for i in 1..200 { // skipping first index, might be validation zero
         if data[i] == 0 {
             return i
         }
     }
-    100
+    200
 }
 
 fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
@@ -61,7 +61,7 @@ fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
             let msg: &[u8] = &msg_vec; // c: &[u8]
             stream.write(msg).unwrap();
 
-            let mut data = [0 as u8; 100];
+            let mut data = [0 as u8; 200];
             match stream.read(&mut data) {
                 Ok(_) => {
                     let zero_index = first_zero(&data);

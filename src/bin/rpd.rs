@@ -104,7 +104,7 @@ fn main() {
 
 fn client(mut stream: TcpStream, mut validate: &mut bool, mut valid_password: &mut String) -> bool {
 
-    let mut data = [0 as u8; 50]; // using 50 byte buffer
+    let mut data = [0 as u8; 200];
     match stream.read(&mut data) {
         Ok(size) => {
             let before_validate = *validate;
