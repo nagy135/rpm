@@ -11,6 +11,9 @@ openssl = "0.10.9"
 rust-crypto = "0.2.36"
 rpassword = "0.0.4"
 exitcode = "1.1.2"
+tui = "0.8"
+termion = "1.5"
+rand = "0.7"
 
 [[bin]]
 name = "rpd"
