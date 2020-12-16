@@ -102,6 +102,14 @@ This project was created with multiple weeks-long breaks, therefore my ideas mig
 * change validation messages for user
 * modifiable timeout delay
 
+# Restart
+After year break I m going to update this project. Db will be changed from file to sqlite db to make datastorage little bit less awkward. And a lot of refactoring.
+
+## TODO
+* test functionality
+* store data in sqlite db
+* refactor
+
 ## License
 
 This project is licensed under the DO_WTF_U_WANT_WITH_IT License.
