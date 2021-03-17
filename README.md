@@ -2,6 +2,10 @@
 
 Simple client/server password manager that keeps you logged in for few minutes and lets you get your login or password into clipboard.
 
+## State
+
+Just recently started working on this again, to substitute file database to sqlite to make this much less about parsing files and more password management.
+
 ## Getting Started
 
 This project exists because at work I often connect to different machines and gui interfaces and I wanted simple rofi-based solution that would get me credentials into clipboard to simply paste it there. In the same time I wanted to get into rust language, so i made this. Whole idea is to get the password safely and without typing master password constantly. Therefore rpm is separated into two binaries, one that runs in the background (rpd - daemon - server) that holds your password and does all the heavy lifting and client (rpc) that simply communicates with it. Prefered way of using rpm is with given rofi bash script.
