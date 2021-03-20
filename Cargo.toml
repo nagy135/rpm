@@ -11,6 +11,8 @@ openssl = "0.10.9"
 rust-crypto = "0.2.36"
 rpassword = "0.0.4"
 exitcode = "1.1.2"
+rusqlite = { version = "*", features = ["bundled"] }
+clap = "2.33.3"
 
 [[bin]]
 name = "rpd"
