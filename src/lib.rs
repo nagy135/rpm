@@ -1,4 +1,3 @@
-
 pub mod constants {
     pub static PASSWORD_HASH_HOLDER: &'static str = "rpm/pass_hash";
     pub const PASS_DELAY: u64 = 600;
@@ -7,13 +6,13 @@ pub mod constants {
 
     pub enum Reason {
         PasswordEmpty,
-        PasswordInvalid
+        PasswordInvalid,
     }
     impl Reason {
         pub fn to_string(&self) -> String {
             match self {
-                PasswordInvalid => String::from("Password is invalid"),
-                PasswordEmpty => String::from("Password is empty")
+                Reason::PasswordInvalid => String::from("Password is invalid"),
+                Reason::PasswordEmpty => String::from("Password is empty"),
             }
         }
     }
@@ -46,11 +45,10 @@ pub mod constants {
                 6 => Event::Init,
                 7 => Event::Delete,
                 8 => Event::Change,
-                _ => Event::Validate
+                _ => Event::Validate,
             }
         }
     }
 
     // }}}
-
 }

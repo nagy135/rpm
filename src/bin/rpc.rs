@@ -1,13 +1,12 @@
 extern crate rpassword;
 
-
 use rpassword::read_password;
 use std::env;
-use std::net::{TcpStream};
 use std::io::{Read, Write};
+use std::net::TcpStream;
 use std::str::from_utf8;
 
-use rpm::constants::Event as Event;
+use rpm::constants::Event;
 
 fn main() {
     std::process::exit(match run_app() {
@@ -22,11 +21,10 @@ fn main() {
     });
 }
 
-fn run_app() -> Result<String, String>{
+fn run_app() -> Result<String, String> {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        let command: &String = &args[1];
-        let response = match command.as_ref() {
+        let response = match args[1].as_str() {
             "new" => new(&args),
             "get" => get(&args),
             "delete" => delete(&args),
@@ -36,7 +34,7 @@ fn run_app() -> Result<String, String>{
             "init" => init(),
             "list" => list(),
             "--help" => help(),
-            _ => Err("Unknown command...try --help".to_string())
+            _ => Err("Unknown command...try --help".to_string()),
         };
         return response;
     }
@@ -44,15 +42,16 @@ fn run_app() -> Result<String, String>{
 }
 
 fn first_zero(data: &[u8; 200]) -> usize {
-    for i in 1..200 { // skipping first index, might be validation zero
+    for i in 1..200 {
+        // skipping first index, might be validation zero
         if data[i] == 0 {
-            return i
+            return i;
         }
     }
     200
 }
 
-fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
+fn send_to_daemon(message: String, event: Event) -> Result<String, String> {
     let result: Result<String, String>;
     match TcpStream::connect("localhost:3333") {
         Ok(mut stream) => {
@@ -70,18 +69,20 @@ fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
                     if *validated == 0 {
                         match event {
                             Event::Init => result = Ok(text.clone()),
-                            _           => result = Err("Validation failed! use validate command".to_string())
+                            _ => {
+                                result = Err("Validation failed! use validate command".to_string())
+                            }
                         }
                     } else {
                         result = Ok(text.clone());
                     }
-                },
+                }
                 Err(e) => {
                     println!("Failed to receive data: {}", e);
                     result = Err("Read failed".to_string());
                 }
             }
-        },
+        }
         Err(e) => {
             println!("Failed to connect: {}", e);
             result = Err("Connect failed".to_string());
@@ -94,7 +95,7 @@ fn send_to_daemon(message: String, event: Event) -> Result<String, String>{
 
 fn concat_vec(args: &Vec<String>) -> String {
     let mut result = String::new();
-    for (i,arg) in args.iter().enumerate() {
+    for (i, arg) in args.iter().enumerate() {
         if i > 1 {
             result.push_str(arg);
             if i < args.len() - 1 {
@@ -107,30 +108,38 @@ fn concat_vec(args: &Vec<String>) -> String {
 
 // }}} utils
 
-fn new(args: &Vec<String>) -> Result<String, String>{
+fn new(args: &Vec<String>) -> Result<String, String> {
     if args.len() < 4 {
-        return Err("Need at least 4 arguments !!! new, key, password (or new, key, login, password)".to_string());
+        return Err(
+            "Need at least 4 arguments !!! new, key, password (or new, key, login, password)"
+                .to_string(),
+        );
     }
     let response = send_to_daemon(concat_vec(&args), Event::New);
     response
 }
 
-fn get(args: &Vec<String>) -> Result<String, String>{
+fn get(args: &Vec<String>) -> Result<String, String> {
     if args.len() < 3 {
-        return Err("Need at least 3 arguments !!! get, key (returns password, login returned by -l flag)".to_string());
+        return Err(
+            "Need at least 3 arguments !!! get, key (returns password, login returned by -l flag)"
+                .to_string(),
+        );
     }
     let response = send_to_daemon(concat_vec(&args), Event::Get);
     response
 }
 
-fn delete(args: &Vec<String>) -> Result<String, String>{
+fn delete(args: &Vec<String>) -> Result<String, String> {
     if args.len() < 3 {
-        return Err("Need 2 arguments, delete and key of record which we try to delete".to_string());
+        return Err(
+            "Need 2 arguments, delete and key of record which we try to delete".to_string(),
+        );
     }
     let response = send_to_daemon(concat_vec(&args), Event::Delete);
     response
 }
-fn validate(args: &Vec<String>) -> Result<String, String>{
+fn validate(args: &Vec<String>) -> Result<String, String> {
     let password;
     if args.len() < 3 {
         println!("Type master password: ");
@@ -141,33 +150,37 @@ fn validate(args: &Vec<String>) -> Result<String, String>{
     let response = send_to_daemon(password, Event::Validate);
     response
 }
-fn init() -> Result<String, String>{
+fn init() -> Result<String, String> {
     println!("Type INITIAL master password (removes all records from storage): ");
     let init_password = read_password().unwrap();
     let response = send_to_daemon(init_password, Event::Init);
     response
 }
 
-fn change_mp() -> Result<String, String>{
+fn change_mp() -> Result<String, String> {
     println!("Type NEW master password: ");
     let new_password = read_password().unwrap();
     let response = send_to_daemon(new_password, Event::ChangeMP);
     response
 }
-fn change(args: &Vec<String>) -> Result<String, String>{
+fn change(args: &Vec<String>) -> Result<String, String> {
     if args.len() < 4 {
-        return Err("Need at least 4 arguments !!! change, key, password (or new, key, login, password)".to_string());
+        return Err(
+            "Need at least 4 arguments !!! change, key, password (or new, key, login, password)"
+                .to_string(),
+        );
     }
     let response = send_to_daemon(concat_vec(&args), Event::Change);
     response
 }
-fn list() -> Result<String, String>{
-    let response = send_to_daemon("".to_string(),  Event::List);
+fn list() -> Result<String, String> {
+    let response = send_to_daemon("".to_string(), Event::List);
     response
 }
 
-fn help() -> Result<String, String>{
-    println!("Rusty password daemon - password manager written in rust running in background
+fn help() -> Result<String, String> {
+    println!(
+        "Rusty password daemon - password manager written in rust running in background
 
 usage: rpc [command] [args...] [--help]
 commands: [new, get, validate, change, list]
@@ -176,6 +189,7 @@ commands: [new, get, validate, change, list]
     validate     - prompts for master password and unlocks for PASS_DELAY seconds
     changeMP     - prompts for old master pass and then new twice
     list         - prints all keys for rofi integration
-    ");
+    "
+    );
     Ok(String::new())
 }
