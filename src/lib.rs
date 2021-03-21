@@ -1,4 +1,6 @@
 pub mod constants {
+    use rusqlite::{Connection, Result};
+
     pub static PASSWORD_HASH_HOLDER: &'static str = "rpm/pass_hash";
     pub const PASS_DELAY: u64 = 600;
     pub static STORAGE: &'static str = "rpm/storage.db";
@@ -17,6 +19,20 @@ pub mod constants {
         }
     }
 
+    // DB {{{
+
+    pub static DEFAULT_DB_LOCATION: &'static str = "db.sqlite";
+    static DB_IS_FILE: bool = true;
+
+    /// returns db connection (either temporary in memory or in file)
+    /// determined by bool constant (mostly for development)
+    fn get_db(db: &str) -> Connection {
+        match DB_IS_FILE {
+            true => Connection::open(db).expect("Could not open db"),
+            false => Connection::open_in_memory().unwrap(),
+        }
+    }
+    // }}}
     // {{{ Enum Event
     #[derive(Debug, Copy, Clone)]
     pub enum Event {
