@@ -13,6 +13,7 @@
     normal-foreground:           @foreground;
     alternate-normal-background: rgba ( 69, 90, 100, 100 % );
     red:                         rgba ( 220, 50, 47, 100 % );
+    yellow:                      rgba ( 249, 220, 43, 100 % );
     selected-urgent-foreground:  rgba ( 253, 246, 227, 100 % );
     blue:                        rgba ( 38, 139, 210, 100 % );
     urgent-foreground:           rgba ( 25, 168, 91, 100 % );
@@ -146,4 +147,12 @@
     str:        ":";
     margin:     0px 0.3em 0em 0em ;
     text-color: @warning;
+}
+element-text {
+    text-color: @foreground;
+    highlight: @red;
+}
+element-text.selected {
+    text-color: @background;
+    highlight: @yellow;
 }
